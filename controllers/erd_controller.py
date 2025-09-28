@@ -83,9 +83,9 @@ class ERDController:
             filename = erd_generator.generate_erd_image(erd_name, erd)
             
             return jsonify({
-                "erd_image": url_for('static', filename=filename),
+                "erd_image": url_for('static', filename=f'image/{filename}'),
                 "erd_name": erd['name'].replace('_', ' ').title(),
-                "download_url": url_for('main.download_erd', filename=filename)
+                "download_url": url_for('api.download_erd', filename=filename)
             })
             
         except Exception as e:
