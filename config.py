@@ -8,6 +8,14 @@ class Config:
     DATABASE_NAME = "Rekom_ERD"
     COLLECTION_NAME = "erd"
     
+    # JWT Configuration
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-key-change-in-production'
+    JWT_ACCESS_TOKEN_EXPIRES = False  # Tidak expire untuk development
+    
+    # Collections
+    USERS_COLLECTION = "users"
+    REQUESTS_COLLECTION = "requests"
+    
     # TF-IDF Configuration
     TFIDF_MAX_FEATURES = 1000
     TFIDF_NGRAM_RANGE = (1, 2)

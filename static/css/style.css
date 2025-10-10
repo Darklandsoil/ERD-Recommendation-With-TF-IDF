@@ -1,10 +1,19 @@
 /* ERD Generator Styles */
-body {
+
+/* Base styles - hanya untuk halaman non-auth */
+body:not(.auth-page) {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f5f5f5;
+}
+
+/* Reset untuk auth pages */
+body.auth-page {
+    max-width: none;
+    margin: 0;
+    padding: 0;
 }
 
 .container {
@@ -328,7 +337,7 @@ button:disabled {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    body {
+    body:not(.auth-page) {
         padding: 10px;
     }
     

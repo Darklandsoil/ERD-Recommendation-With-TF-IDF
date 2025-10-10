@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Dashboard - ERD Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user_dashboard.css') }}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user-dashboard.css') }}">
+</head>
+<body>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>🎯 ERD Generator</h2>
+            </div>
+            <div class="nav-menu">
+                <span id="userWelcome">Loading...</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <!-- Toggle Button -->
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+                <i class='bx bx-chevron-left'></i>
+            </button>
+
+            <div class="sidebar-menu">
+                <a href="#search" class="menu-item active" data-tab="search" onclick="switchTab('search')">
+                    <span>🔍</span>
+                    <span>Cari ERD</span>
+                </a>
+                <a href="#requests" class="menu-item" data-tab="requests" onclick="switchTab('requests')">
+                    <span>📋</span>
+                    <span>Request Saya</span>
+                </a>
+                <a href="#history" class="menu-item" data-tab="history" onclick="switchTab('history')">
+                    <span>📚</span>
+                    <span>Riwayat</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Tab -->
+            <div id="search-tab" class="tab-content active">
+                <div class="content-header">
+                    <h2>Pencarian ERD</h2>
+                    <p>Cari ERD yang sesuai dengan kebutuhan Anda</p>
+                </div>
+
+                <div class="search-section">
+                    <form id="erdForm">
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                id="userInput"
+                                placeholder="Contoh: perpustakaan, sistem akademik, penjualan, dll..."
+                                required
+                            />
+                            <button type="submit" id="searchBtn">
+                                <span id="searchBtnText">Cari ERD</span>
+                                <span id="searchSpinner" class="loading-spinner" style="display: none;"></span>
+                            </button>
+                        </div>
+                        
+                        <div class="search-options">
+                            <label>
+                                Top K:
+                                <input type="number" id="topK" min="1" max="20" value="10">
+                            </label>
+                            <label>
+                                Min Similarity:
+                                <input type="number" id="minSimilarity" min="0" max="1" step="0.01" value="0.05">
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="results-section" id="resultsSection">
+                    <!-- CONTAINER UNTUK EMPTY STATE (CENTERED) -->
+                    <div id="emptyStateContainer" class="empty-state-container" style="display: none;">
+                        <div id="searchStatus"></div>
+                        <button id="askAdvisorBtn" class="ask-advisor-btn" style="display: none;">
+                            💡 Minta Bantuan Advisor
+                        </button>
+                    </div>
+                        
+                        <!-- CONTAINER UNTUK HASIL PENCARIAN (NORMAL) -->
+                    <div class="search-results" id="searchResults" style="display: none;">
+                        <div class="results-header">
+                            <h3 id="searchResultsTitle"></h3>
+                        </div>
+                        <div class="search-results-grid" id="searchResultsGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Tab -->
+            <div id="requests-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Request ERD Saya</h2>
+                    <p>Kelola request ERD yang Anda ajukan ke advisor</p>
+                </div>
+
+                <div class="requests-section">
+                    <div id="requestsLoading" class="loading">Memuat request...</div>
+                    <div id="requestsList" class="requests-list"></div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Riwayat ERD</h2>
+                    <p>ERD yang telah Anda akses dan request yang telah selesai</p>
+                </div>
+
+                <div class="history-section">
+                    <div id="historyLoading" class="loading">Memuat riwayat...</div>
+                    <div id="historyList" class="history-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for ERD Preview -->
+    <div id="erdModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Preview ERD</div>
+                <button class="close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    Memuat ERD...
+                </div>
+                <img id="modalImage" class="modal-image" style="display: none;" />
+                <div id="modalError" style="display: none; color: red;"></div>
+                <div class="modal-actions" id="modalActions" style="display: none;">
+                    <button class="btn-primary" id="fullscreenBtn">Buka Fullscreen</button>
+                    <a class="btn-secondary" id="downloadBtn" href="#" download>Unduh ERD</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Ask Advisor -->
+    <div id="askAdvisorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Minta Bantuan Advisor</div>
+                <button class="close" id="closeAskAdvisorModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="askAdvisorForm">
+                    <div class="form-group">
+                        <label for="requestQuery">Query/Topik ERD:</label>
+                        <input type="text" id="requestQuery" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="requestDescription">Deskripsi Detail:</label>
+                        <textarea 
+                            id="requestDescription" 
+                            rows="4" 
+                            placeholder="Jelaskan secara detail ERD yang Anda butuhkan, termasuk entitas, atribut, dan relasi yang diinginkan..."
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" onclick="closeAskAdvisorModal()" class="btn-secondary">Batal</button>
+                        <button type="submit" class="btn-primary">Kirim Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/user_dashboard.js') }}"></script>
+    
+    <script>
+        // Toggle Sidebar Function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+            
+            // Save state to localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        }
+
+        // Switch Tab Function
+        function switchTab(tabName) {
+            // Remove active class from all tabs and menu items
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Add active class to selected tab and menu item
+            document.getElementById(tabName + '-tab').classList.add('active');
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+            // Load data based on tab
+            if (tabName === 'requests' && typeof loadUserRequests === 'function') {
+                loadUserRequests();
+            } else if (tabName === 'history' && typeof loadUserHistory === 'function') {
+                loadUserHistory();
+            }
+        }
+
+        // Initialize user dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!requireAuth()) return;
+            
+            const user = getUser();
+            if (!user || user.role !== 'user') {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Restore sidebar state from localStorage
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                document.getElementById('sidebar').classList.add('collapsed');
+            }
+            
+            initUserDashboard();
+        });
+    </script>
+</body>
+</html>

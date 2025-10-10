@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advisor Dashboard - ERD Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/advisor.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>🎯 ERD Generator - Advisor</h2>
+            </div>
+            <div class="nav-menu">
+                <span id="advisorWelcome">Loading...</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-menu">
+                <a href="#pending" class="menu-item active" data-tab="pending">
+                    <span>⏳</span> Request Pending
+                </a>
+                <a href="#assigned" class="menu-item" data-tab="assigned">
+                    <span>⚙️</span> Request Saya
+                </a>
+                <a href="#create" class="menu-item" data-tab="create">
+                    <span>➕</span> Buat ERD
+                </a>
+                <a href="#history" class="menu-item" data-tab="history">
+                    <span>📚</span> Riwayat
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Pending Requests Tab -->
+            <div id="pending-tab" class="tab-content active">
+                <div class="content-header">
+                    <h2>Request Pending</h2>
+                    <p>Request dari user yang belum dikerjakan</p>
+                </div>
+
+                <div class="pending-section">
+                    <div id="pendingLoading" class="loading">Memuat request pending...</div>
+                    <div id="pendingList" class="requests-list"></div>
+                </div>
+            </div>
+
+            <!-- Assigned Requests Tab -->
+            <div id="assigned-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Request Yang Saya Kerjakan</h2>
+                    <p>Request yang sedang Anda kerjakan</p>
+                </div>
+
+                <div class="assigned-section">
+                    <div id="assignedLoading" class="loading">Memuat request yang dikerjakan...</div>
+                    <div id="assignedList" class="requests-list"></div>
+                </div>
+            </div>
+
+            <!-- Create ERD Tab -->
+            <div id="create-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Buat ERD Baru</h2>
+                    <p>Form builder untuk membuat ERD manual</p>
+                </div>
+
+                <div class="create-section">
+                    <div id="createERDForm" class="erd-form">
+                        <!-- ERD creation form will be loaded here -->
+                        <div class="form-notice">
+                            Pilih request dari tab "Request Saya" untuk mulai membuat ERD
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Riwayat ERD</h2>
+                    <p>ERD yang telah Anda selesaikan</p>
+                </div>
+
+                <div class="history-section">
+                    <div id="advisorHistoryLoading" class="loading">Memuat riwayat...</div>
+                    <div id="advisorHistoryList" class="history-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for Request Details -->
+    <div id="requestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="requestModalTitle">Detail Request</div>
+                <button class="close" id="closeRequestModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="requestDetails"></div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeRequestModal()" class="btn-secondary">Tutup</button>
+                    <button type="button" id="assignRequestBtn" class="btn-primary" style="display: none;">Ambil Request</button>
+                    <button type="button" id="createERDBtn" class="btn-primary" style="display: none;">Buat ERD</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for ERD Creation -->
+    <div id="erdCreationModal" class="modal large-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="erdCreationTitle">Buat ERD</div>
+                <button class="close" id="closeERDModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="erdForm" class="erd-creation-form">
+                    <div class="form-section">
+                        <h3>Informasi ERD</h3>
+                        <div class="form-group">
+                            <label for="erdName">Nama ERD:</label>
+                            <input type="text" id="erdName" required placeholder="Nama ERD (akan diubah ke format underscore)">
+                        </div>
+                        <div class="form-group">
+                            <label for="erdNotes">Catatan untuk User:</label>
+                            <textarea id="erdNotes" rows="3" placeholder="Catatan atau penjelasan untuk user..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Entitas</h3>
+                        <div id="entitiesContainer">
+                            <!-- Entities will be added dynamically -->
+                        </div>
+                        <button type="button" id="addEntityBtn" class="btn-add">+ Tambah Entitas</button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Relasi</h3>
+                        <div id="relationshipsContainer">
+                            <!-- Relationships will be added dynamically -->
+                        </div>
+                        <button type="button" id="addRelationshipBtn" class="btn-add">+ Tambah Relasi</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" onclick="closeERDCreationModal()" class="btn-secondary">Batal</button>
+                        <button type="submit" class="btn-primary">Simpan & Kirim ERD</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/advisor_dashboard.js') }}"></script>
+    
+    <script>
+        // Initialize advisor dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!requireAuth()) return;
+            
+            const user = getUser();
+            if (!user || user.role !== 'advisor') {
+                window.location.href = '/login';
+                return;
+            }
+            
+            initAdvisorDashboard();
+        });
+    </script>
+</body>
+</html>

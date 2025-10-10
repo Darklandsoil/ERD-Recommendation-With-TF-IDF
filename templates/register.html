@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register - ERD Generator</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+</head>
+<body  class="auth-page">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1>🎯 ERD Generator</h1>
+                <p>Buat akun baru</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        required 
+                        placeholder="Masukkan username (min. 3 karakter)"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        required 
+                        placeholder="Masukkan email"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        required 
+                        placeholder="Masukkan password (min. 6 karakter)"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Tipe Akun</label>
+                    <select id="role" name="role" required>
+                        <option value="user">User (Mencari ERD)</option>
+                        <option value="advisor">Advisor (Pakar ERD)</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="registerBtn" class="auth-btn">
+                    <span id="registerBtnText">Daftar</span>
+                    <span id="registerSpinner" class="loading-spinner" style="display: none;"></span>
+                </button>
+            </form>
+
+            <div id="registerStatus" class="status" style="display: none;"></div>
+
+            <div class="auth-footer">
+                <p>Sudah punya akun? <a href="/login">Masuk di sini</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+    <script>
+        // Initialize register page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if already logged in
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Redirect to appropriate dashboard
+                const user = JSON.parse(localStorage.getItem('user') || '{}');
+                if (user.role === 'advisor') {
+                    window.location.href = '/advisor-dashboard';
+                } else {
+                    window.location.href = '/user-dashboard';
+                }
+            }
+            
+            initRegisterForm();
+        });
+    </script>
+</body>
+</html>

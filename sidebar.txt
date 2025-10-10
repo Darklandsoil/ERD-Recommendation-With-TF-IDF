@@ -1,0 +1,436 @@
+<aside class="sidebar">
+            <div class="sidebar-menu">
+                <a href="#search" class="menu-item active" data-tab="search">
+                    <span>🔍</span> Cari ERD
+                </a>
+                <a href="#requests" class="menu-item" data-tab="requests">
+                    <span>📋</span> Request Saya
+                </a>
+                <a href="#history" class="menu-item" data-tab="history">
+                    <span>📚</span> Riwayat
+                </a>
+            </div>
+</aside>
+
+ <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>🎯 ERD Generator</h2>
+            </div>
+            <div class="nav-menu">
+                <span id="userWelcome">Loading...</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Search Tab -->
+            <div id="search-tab" class="tab-content active">
+                <div class="content-header">
+                    <h2>Pencarian ERD</h2>
+                    <p>Cari ERD yang sesuai dengan kebutuhan Anda</p>
+                </div>
+
+                <div class="search-section">
+                    <form id="erdForm">
+                        <div class="input-group">
+                            <input
+                                type="text"
+                                id="userInput"
+                                placeholder="Contoh: perpustakaan, sistem akademik, penjualan, dll..."
+                                required
+                            />
+                            <button type="submit" id="searchBtn">
+                                <span id="searchBtnText">Cari ERD</span>
+                                <span id="searchSpinner" class="loading-spinner" style="display: none;"></span>
+                            </button>
+                        </div>
+                        
+                        <div class="search-options">
+                            <label>
+                                Top K:
+                                <input type="number" id="topK" min="1" max="20" value="10">
+                            </label>
+                            <label>
+                                Min Similarity:
+                                <input type="number" id="minSimilarity" min="0" max="1" step="0.01" value="0.05">
+                            </label>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="results-section">
+                    <div id="searchStatus"></div>
+                    
+                    <div class="search-results" id="searchResults" style="display: none;">
+                        <div class="results-header">
+                            <h3 id="searchResultsTitle"></h3>
+                            <button id="askAdvisorBtn" class="ask-advisor-btn" style="display: none;">
+                                💡 Minta Bantuan Advisor
+                            </button>
+                        </div>
+                        <div class="search-results-grid" id="searchResultsGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Requests Tab -->
+            <div id="requests-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Request ERD Saya</h2>
+                    <p>Kelola request ERD yang Anda ajukan ke advisor</p>
+                </div>
+
+                <div class="requests-section">
+                    <div id="requestsLoading" class="loading">Memuat request...</div>
+                    <div id="requestsList" class="requests-list"></div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div id="history-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Riwayat ERD</h2>
+                    <p>ERD yang telah Anda akses dan request yang telah selesai</p>
+                </div>
+
+                <div class="history-section">
+                    <div id="historyLoading" class="loading">Memuat riwayat...</div>
+                    <div id="historyList" class="history-list"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal for ERD Preview -->
+    <div id="erdModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modalTitle">Preview ERD</div>
+                <button class="close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    Memuat ERD...
+                </div>
+                <img id="modalImage" class="modal-image" style="display: none;" />
+                <div id="modalError" style="display: none; color: red;"></div>
+                <div class="modal-actions" id="modalActions" style="display: none;">
+                    <button class="btn-primary" id="fullscreenBtn">Buka Fullscreen</button>
+                    <a class="btn-secondary" id="downloadBtn" href="#" download>Unduh ERD</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Ask Advisor -->
+    <div id="askAdvisorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Minta Bantuan Advisor</div>
+                <button class="close" id="closeAskAdvisorModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="askAdvisorForm">
+                    <div class="form-group">
+                        <label for="requestQuery">Query/Topik ERD:</label>
+                        <input type="text" id="requestQuery" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="requestDescription">Deskripsi Detail:</label>
+                        <textarea 
+                            id="requestDescription" 
+                            rows="4" 
+                            placeholder="Jelaskan secara detail ERD yang Anda butuhkan, termasuk entitas, atribut, dan relasi yang diinginkan..."
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" onclick="closeAskAdvisorModal()" class="btn-secondary">Batal</button>
+                        <button type="submit" class="btn-primary">Kirim Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+/* Authentication Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.auth-card {
+    background: white;
+    border-radius: 20px;
+    padding: 45px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-header h1 {
+    color: #333;
+    margin: 0 0 10px 0;
+    font-size: 2.2em;
+    font-weight: 700;
+}
+
+.auth-header p {
+    color: #666;
+    margin: 0 0 35px 0;
+    font-size: 1.05em;
+    font-weight: 400;
+}
+
+.auth-form {
+    text-align: left;
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 1em;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+    background-color: #fafbfc;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
+}
+
+.form-group input::placeholder {
+    color: #adb5bd;
+}
+
+.form-group select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.auth-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.auth-btn:active {
+    transform: translateY(0);
+}
+
+.auth-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.status {
+    margin-top: 20px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-align: center;
+    font-size: 0.95em;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+.auth-footer {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.auth-footer p {
+    color: #666;
+    margin: 0;
+    font-size: 0.95em;
+}
+
+.auth-footer a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.auth-footer a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-height: 700px) {
+    .auth-card {
+        padding: 30px 35px;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.9em;
+        margin-bottom: 8px;
+    }
+    
+    .auth-header p {
+        margin-bottom: 25px;
+        font-size: 1em;
+    }
+    
+    .form-group {
+        margin-bottom: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-container {
+        padding: 15px;
+    }
+    
+    .auth-card {
+        padding: 35px 25px;
+        border-radius: 15px;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.8em;
+    }
+    
+    .auth-header p {
+        font-size: 1em;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 12px 14px;
+    }
+    
+    .auth-btn {
+        padding: 14px;
+        font-size: 1.05em;
+    }
+}
+
+@media (max-width: 360px) {
+    .auth-card {
+        padding: 30px 20px;
+    }
+    
+    .auth-header h1 {
+        font-size: 1.6em;
+    }
+}
