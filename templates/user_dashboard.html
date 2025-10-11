@@ -10,7 +10,7 @@
 <body>
     
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar">    
         <div class="nav-container">
             <div class="nav-brand">
                 <h2>🎯 ERD Generator</h2>
@@ -197,29 +197,6 @@
             const isCollapsed = sidebar.classList.contains('collapsed');
             localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
-
-        // Switch Tab Function
-        function switchTab(tabName) {
-            // Remove active class from all tabs and menu items
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            document.querySelectorAll('.menu-item').forEach(item => {
-                item.classList.remove('active');
-            });
-
-            // Add active class to selected tab and menu item
-            document.getElementById(tabName + '-tab').classList.add('active');
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-
-            // Load data based on tab
-            if (tabName === 'requests' && typeof loadUserRequests === 'function') {
-                loadUserRequests();
-            } else if (tabName === 'history' && typeof loadUserHistory === 'function') {
-                loadUserHistory();
-            }
-        }
-
         // Initialize user dashboard
         document.addEventListener('DOMContentLoaded', function() {
             if (!requireAuth()) return;
