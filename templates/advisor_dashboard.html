@@ -205,13 +205,13 @@
             if (selectedMenuItem) selectedMenuItem.classList.add('active');
 
             // Load data based on tab
-            if (tabName === 'pending' && typeof loadPendingRequests === 'function') {
-                loadPendingRequests();
-            } else if (tabName === 'assigned' && typeof loadAssignedRequests === 'function') {
-                loadAssignedRequests();
-            } else if (tabName === 'history' && typeof loadAdvisorHistory === 'function') {
-                loadAdvisorHistory();
-            }
+            // if (tabName === 'pending' && typeof loadPendingRequests === 'function') {
+            //     loadPendingRequests();
+            // } else if (tabName === 'assigned' && typeof loadAssignedRequests === 'function') {
+            //     loadAssignedRequests();
+            // } else if (tabName === 'history' && typeof loadAdvisorHistory === 'function') {
+            //     loadAdvisorHistory();
+            // }
 
             // Update URL hash without scrolling
             history.pushState(null, null, '#' + tabName);
