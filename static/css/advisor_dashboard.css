@@ -652,6 +652,20 @@ body {
     background: #c82333;
 }
 
+.remove-relationship {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.remove-relationship:hover {
+    background: #c82333;
+}
+
 .item-number {
     background: var(--success-color);
     color: white;

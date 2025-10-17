@@ -407,6 +407,33 @@ function removeEntity(entityId) {
     updateRelationshipOptions();
 }
 
+// function addAttribute(entityId) {
+//     const input = document.querySelector(`[data-entity-id="${entityId}"] .new-attribute`);
+//     const attributeName = input.value.trim();
+    
+//     if (!attributeName) return;
+    
+//     const attributesList = document.getElementById(`attributes_${entityId}`);
+    
+//     const attributeSpan = document.createElement('span');
+//     attributeSpan.className = 'attribute-item';
+//     attributeSpan.innerHTML = `
+//         ${attributeName}
+//         <button type="button" class="remove-attribute" onclick="removeAttribute(this, '${entityId}', '${attributeName}')">&times;</button>
+//     `;
+    
+//     attributesList.appendChild(attributeSpan);
+    
+//     // Add to entity data
+//     const entity = entities.find(e => e.id === entityId);
+//     if (entity) {
+//         entity.attributes.push(attributeName);
+//     }
+    
+//     input.value = '';
+// }
+
+// PERBAIKAN addAttribute
 function addAttribute(entityId) {
     const input = document.querySelector(`[data-entity-id="${entityId}"] .new-attribute`);
     const attributeName = input.value.trim();
@@ -419,12 +446,26 @@ function addAttribute(entityId) {
     attributeSpan.className = 'attribute-item';
     attributeSpan.innerHTML = `
         ${attributeName}
-        <button type="button" class="remove-attribute" onclick="removeAttribute(this, '${entityId}', '${attributeName}')">&times;</button>
+        <button type="button" class="remove-attribute">&times;</button>
     `;
     
     attributesList.appendChild(attributeSpan);
     
-    // Add to entity data
+    // Tambahkan event listener untuk button remove
+    const removeBtn = attributeSpan.querySelector('.remove-attribute');
+    removeBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        attributeSpan.remove();
+        
+        // Remove dari entity data
+        const entity = entities.find(e => e.id === entityId);
+        if (entity) {
+            entity.attributes = entity.attributes.filter(a => a !== attributeName);
+        }
+    });
+    
+    // Add ke entity data
     const entity = entities.find(e => e.id === entityId);
     if (entity) {
         entity.attributes.push(attributeName);
@@ -433,13 +474,30 @@ function addAttribute(entityId) {
     input.value = '';
 }
 
-function removeAttribute(button, entityId, attributeName) {
-    button.parentElement.remove();
+// function removeAttribute(button, entityId, attributeName) {
+//     button.parentElement.remove();
     
-    // Remove from entity data
-    const entity = entities.find(e => e.id === entityId);
-    if (entity) {
-        entity.attributes = entity.attributes.filter(a => a !== attributeName);
+//     // Remove from entity data
+//     const entity = entities.find(e => e.id === entityId);
+//     if (entity) {
+//         entity.attributes = entity.attributes.filter(a => a !== attributeName);
+//     }
+// }
+
+
+// PERBAIKAN RemoveAttribute
+function removeAttribute(button, entityId, attributeName) {
+    // Gunakan parentElement untuk mencari span yang berisi button
+    const attributeSpan = button.closest('.attribute-item');
+    
+    if (attributeSpan) {
+        attributeSpan.remove();
+        
+        // Remove dari entity data
+        const entity = entities.find(e => e.id === entityId);
+        if (entity) {
+            entity.attributes = entity.attributes.filter(a => a !== attributeName);
+        }
     }
 }
 
