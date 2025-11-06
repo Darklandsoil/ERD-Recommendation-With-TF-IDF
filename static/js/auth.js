@@ -107,7 +107,9 @@ function initLoginForm() {
                 
                 // Redirect berdasarkan role
                 setTimeout(() => {
-                    if (data.user.role === 'advisor') {
+                    if (data.user.role === 'admin') {
+                        window.location.href = '/admin/dashboard';
+                    } else if (data.user.role === 'advisor') {
                         window.location.href = '/advisor-dashboard';
                     } else {
                         window.location.href = '/user-dashboard';
@@ -135,9 +137,8 @@ function initRegisterForm() {
         const username = document.getElementById('username').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
-        const role = document.getElementById('role').value;
         
-        if (!username || !email || !password || !role) {
+        if (!username || !email || !password) {
             showStatus('registerStatus', 'Semua field harus diisi', 'error');
             return;
         }
@@ -158,7 +159,7 @@ function initRegisterForm() {
         try {
             const response = await apiCall('/auth/register', {
                 method: 'POST',
-                body: JSON.stringify({ username, email, password, role })
+                body: JSON.stringify({ username, email, password })
             });
             
             const data = await response.json();

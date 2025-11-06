@@ -81,15 +81,17 @@
             <div id="create-tab" class="tab-content">
                 <div class="content-header">
                     <h2>Buat ERD Baru</h2>
-                    <p>Form builder untuk membuat ERD manual</p>
+                    <button onclick="openDirectERDCreation()" class="btn-primary">
+                        ➕ Buat ERD Langsung
+                    </button>
                 </div>
 
                 <div class="create-section">
-                    <div id="createERDForm" class="erd-form">
-                        <!-- ERD creation form will be loaded here -->
-                        <div class="form-notice">
-                            💡 Pilih request dari tab "Request Saya" untuk mulai membuat ERD
-                        </div>
+                    <!-- My ERDs Section -->
+                    <div class="my-erds-section">
+                        <h3>ERD yang Saya Buat</h3>
+                        <div id="myERDsLoading" class="loading" style="display: none;">Memuat ERD...</div>
+                        <div id="myERDsList" class="erds-grid"></div>
                     </div>
                 </div>
             </div>

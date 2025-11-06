@@ -8,7 +8,7 @@ class AuthController:
     
     @staticmethod
     def register():
-        """Register new user"""
+        """Register new user (only 'user' role, no role selection)"""
         try:
             data = request.json
             
@@ -16,12 +16,12 @@ class AuthController:
             if not data.get('username') or not data.get('email') or not data.get('password'):
                 return jsonify({"error": "Username, email, dan password diperlukan"}), 400
             
-            # Create user model
+            # Create user model with 'user' role only
             user = UserModel(
                 username=data.get('username'),
                 email=data.get('email'),
                 password=data.get('password'),
-                role=data.get('role', 'user')  # default role is 'user'
+                role='user'  # Force user role for registration
             )
             
             # Validate user data

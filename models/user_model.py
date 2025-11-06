@@ -64,7 +64,7 @@ class UserModel:
         if not self.password_hash:
             errors.append("Password diperlukan")
         
-        if self.role not in ["user", "advisor"]:
-            errors.append("Role harus 'user' atau 'advisor'")
+        if self.role not in ["user", "advisor", "admin"]:
+            errors.append("Role harus 'user', 'advisor', atau 'admin'")
         
         return len(errors) == 0, errors

@@ -49,6 +49,8 @@ function initAdvisorTabNavigation() {
                 loadPendingRequests();
             } else if (tabId === 'assigned-tab') {
                 loadAssignedRequests();
+            } else if (tabId === 'create-tab') {
+                loadMyERDs();
             } else if (tabId === 'history-tab') {
                 loadAdvisorHistory();
             }
@@ -541,6 +543,16 @@ function addRelationship() {
                     <option value="many-to-many">Many to Many</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label>layout:</label>
+                <select class="relationship-layout" required="">
+                    <option value="">Pilih Layout</option>
+                    <option value="RL">Right To Left</option>
+                    <option value="LR">Left To Right</option>
+                    <option value="TB">Top To Bottom</option>
+                    <option value="BT">Bottom To Top</option>
+                </select>
+            </div>
         </div>
     `;
     
@@ -552,7 +564,8 @@ function addRelationship() {
         entity1: '',
         entity2: '',
         relation: '',
-        type: ''
+        type: '',
+        layout: ''
     });
     
     // Update entity options
@@ -637,18 +650,21 @@ async function handleERDSubmission(event) {
         const entity2Select = relationshipDiv.querySelector('.relationship-entity2');
         const nameInput = relationshipDiv.querySelector('.relationship-name');
         const typeSelect = relationshipDiv.querySelector('.relationship-type');
+        const layoutSelect = relationshipDiv.querySelector('.relationship-layout')
         
         const entity1 = entity1Select.value;
         const entity2 = entity2Select.value;
         const relationName = nameInput.value.trim();
         const relationType = typeSelect.value;
+        const relationLayout = layoutSelect.value;
         
-        if (entity1 && entity2 && relationName && relationType) {
+        if (entity1 && entity2 && relationName && relationType && relationLayout) {
             relationshipsData.push({
                 entity1: entity1,
                 entity2: entity2,
                 relation: relationName,
-                type: relationType
+                type: relationType,
+                layout: relationLayout
             });
         }
     });
@@ -771,3 +787,211 @@ document.addEventListener('input', function(e) {
         updateRelationshipOptions();
     }
 });
+
+
+// ==========================================
+// DIRECT ERD CREATION FUNCTIONS
+// ==========================================
+
+// Load advisor's own ERDs
+async function loadMyERDs() {
+    const loadingEl = document.getElementById('myERDsLoading');
+    const listEl = document.getElementById('myERDsList');
+    
+    loadingEl.style.display = 'block';
+    listEl.innerHTML = '';
+    
+    try {
+        const response = await apiCall('/api/advisor-erds');
+        const data = await response.json();
+        
+        if (response.ok) {
+            renderMyERDs(data.erds);
+        } else {
+            listEl.innerHTML = `<div class="error-message">Gagal memuat ERD: ${data.error}</div>`;
+        }
+    } catch (error) {
+        listEl.innerHTML = '<div class="error-message">Gagal memuat ERD</div>';
+        console.error('Error:', error);
+    } finally {
+        loadingEl.style.display = 'none';
+    }
+}
+
+function renderMyERDs(erds) {
+    const listEl = document.getElementById('myERDsList');
+    
+    if (erds.length === 0) {
+        listEl.innerHTML = `
+            <div class="empty-erds">
+                <i class='bx bx-folder-open'></i>
+                <p>Anda belum membuat ERD</p>
+                <p style="font-size: 0.9rem; margin-top: 10px;">Klik tombol "Buat ERD Langsung" untuk membuat ERD baru</p>
+            </div>
+        `;
+        return;
+    }
+    
+    erds.forEach(erd => {
+        const erdCard = document.createElement('div');
+        erdCard.className = 'erd-card';
+        
+        erdCard.innerHTML = `
+            <div class="erd-card-header">
+                <div class="erd-card-title">${erd.nama}</div>
+                <div class="erd-card-stats">
+                    <div class="erd-card-stat">
+                        <span>📋</span>
+                        <span>${erd.entity_count} Entitas</span>
+                    </div>
+                    <div class="erd-card-stat">
+                        <span>🔗</span>
+                        <span>${erd.relationship_count} Relasi</span>
+                    </div>
+                    <div class="erd-card-stat">
+                        <span>📆</span>
+                        <span>${erd.created_at} Tanggal Buat</span>
+                    </div>
+                </div>
+            </div>
+            <div class="erd-card-actions">
+                <button class="btn-view-erd" onclick="viewERDImage('${erd.name}')">
+                    👁️ Lihat ERD
+                </button>
+                <button class="btn-delete-erd" onclick="deleteERD('${erd.name}', '${erd.display_name}')">
+                    🗑️ Hapus
+                </button>
+            </div>
+        `;
+        
+        listEl.appendChild(erdCard);
+    });
+}
+
+// Open direct ERD creation modal
+function openDirectERDCreation() {
+    currentRequest = null; // No request association
+    entities = [];
+    relationships = [];
+    entityCounter = 0;
+    relationshipCounter = 0;
+    
+    // Reset form
+    document.getElementById('erdForm').reset();
+    document.getElementById('entitiesContainer').innerHTML = '';
+    document.getElementById('relationshipsContainer').innerHTML = '';
+    
+    // Change modal title
+    document.getElementById('erdCreationTitle').textContent = 'Buat ERD Baru (Langsung)';
+    
+    // Show modal
+    document.getElementById('erdCreationModal').style.display = 'block';
+}
+
+// View ERD image
+async function viewERDImage(erdName) {
+    try {
+        const response = await fetch(`/api/generate-erd-image/${erdName}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+            // Open in new window
+            window.open(data.erd_image, '_blank');
+        } else {
+            alert(`Gagal membuka ERD: ${data.error}`);
+        }
+    } catch (error) {
+        alert('Gagal membuka ERD');
+        console.error('Error:', error);
+    }
+}
+
+// Delete ERD
+async function deleteERD(erdName, displayName) {
+    if (!confirm(`Apakah Anda yakin ingin menghapus ERD "${displayName}"?`)) {
+        return;
+    }
+    
+    try {
+        const response = await apiCall('/api/delete-erd', 'DELETE', {
+            erd_name: erdName
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            alert('ERD berhasil dihapus!');
+            loadMyERDs(); // Reload the list
+        } else {
+            alert(`Gagal menghapus ERD: ${data.error}`);
+        }
+    } catch (error) {
+        alert('Gagal menghapus ERD');
+        console.error('Error:', error);
+    }
+}
+
+// Override submitERD to handle both request-based and direct creation
+const originalSubmitERD = window.submitERD;
+window.submitERD = async function() {
+    const erdName = document.getElementById('erdName').value.trim();
+    const erdNotes = document.getElementById('erdNotes').value.trim();
+    
+    if (!erdName) {
+        alert('Nama ERD harus diisi!');
+        return;
+    }
+    
+    if (entities.length === 0) {
+        alert('Minimal harus ada 1 entitas!');
+        return;
+    }
+    
+    if (relationships.length === 0) {
+        alert('Minimal harus ada 1 relasi!');
+        return;
+    }
+    
+    // Prepare ERD data
+    const erdData = {
+        name: erdName,
+        entities: entities.map(e => ({
+            name: e.name,
+            attributes: e.attributes
+        })),
+        relationships: relationships.map(r => ({
+            entity1: r.entity1,
+            entity2: r.entity2,
+            type: r.type
+        })),
+        advisor_id: getUser().user_id // Add advisor_id for tracking
+    };
+    
+    try {
+        // If there's a current request, use the original flow
+        if (currentRequest) {
+            return originalSubmitERD();
+        }
+        
+        // Direct ERD creation (no request)
+        const erdResponse = await apiCall('/api/add-erd', 'POST', erdData);
+        const erdResult = await erdResponse.json();
+        
+        if (!erdResponse.ok) {
+            alert(`Gagal menyimpan ERD: ${erdResult.error}`);
+            return;
+        }
+        
+        alert('ERD berhasil dibuat!');
+        
+        // Close modal
+        document.getElementById('erdCreationModal').style.display = 'none';
+        
+        // Reload ERD list
+        loadMyERDs();
+        
+    } catch (error) {
+        alert(`Gagal membuat ERD: ${error.message}`);
+        console.error('Error:', error);
+    }
+}

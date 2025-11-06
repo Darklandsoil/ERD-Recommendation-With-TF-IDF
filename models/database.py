@@ -1,5 +1,6 @@
 from pymongo import MongoClient
 from config import Config
+from bson import ObjectId
 
 class Database:
     """Database connection and operations"""
@@ -56,6 +57,41 @@ class Database:
     def get_all_advisors(self):
         """Get all advisors"""
         return list(self.users_collection.find({"role": "advisor", "is_active": True}))
+    
+    def get_all_users_by_role(self, role):
+        """Get all users by role"""
+        return list(self.users_collection.find({"role": role}))
+    
+    def update_user(self, user_id, update_data):
+        """Update user data"""
+        return self.users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": update_data}
+        )
+    
+    def delete_user(self, user_id):
+        """Delete user (soft delete by setting is_active to False)"""
+        return self.users_collection.update_one(
+            {"user_id": user_id},
+            {"$set": {"is_active": False}}
+        )
+    
+    def hard_delete_user(self, user_id):
+        """Permanently delete user"""
+        return self.users_collection.delete_one({"user_id": user_id})
+    
+    # ERD deletion methods
+    def delete_erd(self, erd_name):
+        """Delete ERD by name"""
+        return self.erd_collection.delete_one({"name": erd_name})
+    
+    def get_erds_by_advisor(self, advisor_id):
+        """Get all ERDs created by specific advisor"""
+        return list(self.requests_collection.find({
+            "advisor_id": advisor_id,
+            "status": "complete",
+            "erd_result": {"$exists": True} 
+            }).sort("created_at", -1))
     
     # Request Methods
     def create_request(self, request_data):

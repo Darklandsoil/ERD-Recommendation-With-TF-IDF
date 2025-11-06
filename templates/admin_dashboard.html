@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - ERD Generator</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h2>🎯 ERD Generator - Admin</h2>
+            </div>
+            <div class="nav-menu">
+                <span id="adminWelcome">Loading...</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Advisor Management Section -->
+            <div class="content-header">
+                <h2>Manajemen Pakar (Advisor)</h2>
+                <button onclick="showAddAdvisorModal()" class="btn-primary">
+                    <i class='bx bx-plus'></i> Tambah Pakar Baru
+                </button>
+            </div>
+
+            <div class="advisors-section">
+                <div id="advisorsLoading" class="loading">Memuat data pakar...</div>
+                <div id="advisorsTable" class="table-container"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add Advisor Modal -->
+    <div id="addAdvisorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Tambah Pakar Baru</h3>
+                <button onclick="closeAddAdvisorModal()" class="close-btn">&times;</button>
+            </div>
+            <form id="addAdvisorForm" class="modal-form">
+                <div class="form-group">
+                    <label for="newUsername">Username</label>
+                    <input type="text" id="newUsername" required placeholder="Username pakar (min. 3 karakter)">
+                </div>
+                <div class="form-group">
+                    <label for="newEmail">Email</label>
+                    <input type="email" id="newEmail" required placeholder="Email pakar">
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">Password</label>
+                    <input type="password" id="newPassword" required placeholder="Password (min. 6 karakter)">
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeAddAdvisorModal()" class="btn-secondary">Batal</button>
+                    <button type="submit" class="btn-primary">Tambah Pakar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Advisor Modal -->
+    <div id="editAdvisorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Pakar</h3>
+                <button onclick="closeEditAdvisorModal()" class="close-btn">&times;</button>
+            </div>
+            <form id="editAdvisorForm" class="modal-form">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername" required placeholder="Username pakar">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email</label>
+                    <input type="email" id="editEmail" required placeholder="Email pakar">
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">Password Baru (kosongkan jika tidak ingin mengubah)</label>
+                    <input type="password" id="editPassword" placeholder="Password baru">
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeEditAdvisorModal()" class="btn-secondary">Batal</button>
+                    <button type="submit" class="btn-primary">Update Pakar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+</body>
+</html>

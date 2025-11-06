@@ -6,6 +6,7 @@ from routes.main_routes import main_bp
 from routes.api_routes import api_bp
 from routes.auth_routes import auth_bp
 from routes.request_routes import request_bp
+from routes.admin_routes import admin_bp
 
 def create_app(config_name=None):
     """Application factory pattern"""
@@ -23,6 +24,7 @@ def create_app(config_name=None):
     app.register_blueprint(api_bp)
     app.register_blueprint(auth_bp)
     app.register_blueprint(request_bp)
+    app.register_blueprint(admin_bp)
     
     # Ensure upload folder exists
     if not os.path.exists(app.config['UPLOAD_FOLDER']):

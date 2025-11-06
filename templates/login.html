@@ -60,7 +60,9 @@
             if (token) {
                 // Redirect to appropriate dashboard
                 const user = JSON.parse(localStorage.getItem('user') || '{}');
-                if (user.role === 'advisor') {
+                if (user.role === 'admin') {
+                    window.location.href = '/admin/dashboard';
+                } else if (user.role === 'advisor') {
                     window.location.href = '/advisor-dashboard';
                 } else {
                     window.location.href = '/user-dashboard';

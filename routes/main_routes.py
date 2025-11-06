@@ -35,3 +35,8 @@ def user_dashboard():
 def advisor_dashboard():
     """Advisor dashboard"""
     return render_template("advisor_dashboard.html")
+
+@main_bp.route("/admin-dashboard")
+def admin_dashboard():
+    """Admin dashboard"""
+    return render_template("admin_dashboard.html")

@@ -1,0 +1,642 @@
+[{
+  "_id": {
+    "$oid": "68db7022fcef581d21b54578"
+  },
+  "request_id": "a1d6ea50-3ace-4d0a-a0e9-cac0dc22db0b",
+  "user_id": "c82f8ad6-223b-4754-b8e4-047be17b27da",
+  "query": "game",
+  "description": "jadfjkasdjkfjaskjfksajdfkjjdkslakdjf",
+  "status": "complete",
+  "advisor_id": "358f4cce-c403-448d-aa59-5e911a2213f5",
+  "created_at": {
+    "$date": "2025-09-30T13:52:34.877Z"
+  },
+  "updated_at": {
+    "$date": "2025-09-30T14:19:01.766Z"
+  },
+  "completed_at": {
+    "$date": "2025-09-30T14:19:01.766Z"
+  },
+  "erd_result": {
+    "name": "game_managament_system",
+    "entities": [
+      {
+        "name": "player",
+        "attributes": [
+          "playerId",
+          "username",
+          "email",
+          "password",
+          "level",
+          "experience"
+        ],
+        "primary_key": "playerId"
+      },
+      {
+        "name": "Game",
+        "attributes": [
+          "gameId",
+          "title",
+          "genre",
+          "ReleaseDate"
+        ],
+        "primary_key": "gameId"
+      },
+      {
+        "name": "Character",
+        "attributes": [
+          "characterId",
+          "Name",
+          "Class",
+          "Level",
+          "Hp",
+          "Mp"
+        ],
+        "primary_key": "characterId"
+      },
+      {
+        "name": "Item",
+        "attributes": [
+          "itemId",
+          "itemName",
+          "ItemType",
+          "rarity"
+        ],
+        "primary_key": "itemId"
+      }
+    ],
+    "relationships": [
+      {
+        "entity1": "player",
+        "entity2": "Character",
+        "relation": "memiliki",
+        "type": "one-to-many"
+      },
+      {
+        "entity1": "Game",
+        "entity2": "Character",
+        "relation": "bermain di",
+        "type": "one-to-many"
+      },
+      {
+        "entity1": "Character",
+        "entity2": "Item",
+        "relation": "menggunakan",
+        "type": "many-to-many"
+      }
+    ]
+  },
+  "notes": ""
+},
+{
+  "_id": {
+    "$oid": "68e74eef4353d86d97db755f"
+  },
+  "request_id": "a39b910e-d301-426f-a1fd-15649f02168d",
+  "user_id": "c82f8ad6-223b-4754-b8e4-047be17b27da",
+  "query": "tampilkan ERD dengan entitas pegawai",
+  "description": "Saya ingin membuat ERD sistem informasi perkantoran dimana Entitas yang terdiri dari beberapa entitas seperti pegawai, divisi/seksi, dan lain sebagainya",
+  "status": "complete",
+  "advisor_id": "d56578c8-32cb-4f4c-9e82-c038fe4db1aa",
+  "created_at": {
+    "$date": "2025-10-09T13:58:07.040Z"
+  },
+  "updated_at": {
+    "$date": "2025-10-17T19:22:53.159Z"
+  },
+  "completed_at": {
+    "$date": "2025-10-17T19:22:53.159Z"
+  },
+  "erd_result": {
+    "name": "kantor",
+    "entities": [
+      {
+        "name": "user",
+        "attributes": [
+          "username",
+          "password",
+          "User_role"
+        ],
+        "primary_key": "Id_user"
+      },
+      {
+        "name": "User_role",
+        "attributes": [
+          "User_role"
+        ],
+        "primary_key": "Id_User_role"
+      },
+      {
+        "name": "Pegawai",
+        "attributes": [
+          "Nama_pegawai",
+          "Bagian",
+          "Jabatan"
+        ],
+        "primary_key": "Id_pegawai"
+      },
+      {
+        "name": "Berkas",
+        "attributes": [
+          "Id_Pegawai",
+          "Tanggal",
+          "Berkas"
+        ],
+        "primary_key": "Id_Berkas"
+      },
+      {
+        "name": "verifikasi_BKDD",
+        "attributes": [
+          "Id_Berkas",
+          "Tanggal",
+          "Status_Verifkasi"
+        ],
+        "primary_key": "Id_BKDD"
+      },
+      {
+        "name": "Verifikasi_Kepegawaian",
+        "attributes": [
+          "Id_Berkas",
+          "Tanggal",
+          "Status_Verifikasi"
+        ],
+        "primary_key": "Id_Kepegewaian"
+      },
+      {
+        "name": "Bagian",
+        "attributes": [
+          "Bagian"
+        ],
+        "primary_key": "Id_bagian"
+      }
+    ],
+    "relationships": [
+      {
+        "entity1": "user",
+        "entity2": "User_role",
+        "relation": "Memiliki",
+        "type": "one-to-one"
+      },
+      {
+        "entity1": "user",
+        "entity2": "Pegawai",
+        "relation": "Memiliki",
+        "type": "one-to-one"
+      },
+      {
+        "entity1": "Bagian",
+        "entity2": "Pegawai",
+        "relation": "memiliki",
+        "type": "one-to-many"
+      },
+      {
+        "entity1": "Pegawai",
+        "entity2": "Berkas",
+        "relation": "memasukkan",
+        "type": "one-to-many"
+      },
+      {
+        "entity1": "Berkas",
+        "entity2": "verifikasi_BKDD",
+        "relation": "diverifikasi",
+        "type": "one-to-one"
+      },
+      {
+        "entity1": "Berkas",
+        "entity2": "Verifikasi_Kepegawaian",
+        "relation": "diverifikasi",
+        "type": "one-to-one"
+      }
+    ]
+  },
+  "notes": "Ini ERD umum di dunia perkantoran"
+},
+{
+  "_id": {
+    "$oid": "68f61697e40bd59eab12171f"
+  },
+  "request_id": "308ecf70-7883-4ca2-b8a9-bf3b244f88d2",
+  "user_id": "c82f8ad6-223b-4754-b8e4-047be17b27da",
+  "query": "perpus",
+  "description": "Buatkan erd terkait sistem dapodik sekolah",
+  "status": "complete",
+  "advisor_id": "d56578c8-32cb-4f4c-9e82-c038fe4db1aa",
+  "created_at": {
+    "$date": "2025-10-20T19:01:43.705Z"
+  },
+  "updated_at": {
+    "$date": "2025-10-25T21:21:30.513Z"
+  },
+  "completed_at": {
+    "$date": "2025-10-25T21:21:30.513Z"
+  },
+  "erd_result": {
+    "name": "perpus",
+    "entities": [
+      {
+        "name": "Mahasiswa",
+        "attributes": [
+          "NIM",
+          "Nama",
+          "Jurusan",
+          "Kelas"
+        ],
+        "primary_key": "NIM"
+      },
+      {
+        "name": "Peminjaman",
+        "attributes": [
+          "IdPinjam",
+          "Tanggal_Pinjam",
+          "BatasPinjam",
+          "Tanggal_Kembali",
+          "NIM"
+        ],
+        "primary_key": "IdPinjam"
+      },
+      {
+        "name": "Buku",
+        "attributes": [
+          "IdBuku",
+          "Judul",
+          "Penulis",
+          "IdPinjam",
+          "Penerbit"
+        ],
+        "primary_key": "IdBuku"
+      }
+    ],
+    "relationships": [
+      {
+        "entity1": "Mahasiswa",
+        "entity2": "Peminjaman",
+        "relation": "Melakukan",
+        "type": "one-to-many",
+        "layout": "RL"
+      },
+      {
+        "entity1": "Peminjaman",
+        "entity2": "Buku",
+        "relation": "Memiliki",
+        "type": "one-to-many",
+        "layout": "TB"
+      }
+    ]
+  },
+  "notes": ""
+},
+{
+  "_id": {
+    "$oid": "68fcd8e27258c59ee3955fd3"
+  },
+  "request_id": "26a80426-204a-4267-9881-d3a78765e0b1",
+  "user_id": "c82f8ad6-223b-4754-b8e4-047be17b27da",
+  "query": "univ",
+  "description": "buat entitas mahasiswa dan matkul",
+  "status": "complete",
+  "advisor_id": "d56578c8-32cb-4f4c-9e82-c038fe4db1aa",
+  "created_at": {
+    "$date": "2025-10-25T22:04:18.950Z"
+  },
+  "updated_at": {
+    "$date": "2025-10-25T22:09:36.432Z"
+  },
+  "completed_at": {
+    "$date": "2025-10-25T22:09:36.432Z"
+  },
+  "erd_result": {
+    "name": "univ",
+    "entities": [
+      {
+        "name": "Mahasiswa",
+        "attributes": [
+          "NIM",
+          "Nama",
+          "Kelas",
+          "Jurusan"
+        ],
+        "primary_key": "NIM"
+      },
+      {
+        "name": "Mata_Kuliah",
+        "attributes": [
+          "Kd_Matkul",
+          "NIM",
+          "Nama_Matkul"
+        ],
+        "primary_key": "Kd_Matkul"
+      }
+    ],
+    "relationships": [
+      {
+        "entity1": "Mahasiswa",
+        "entity2": "Mata_Kuliah",
+        "relation": "Memilih",
+        "type": "one-to-many",
+        "layout": {
+          "0": {},
+          "1": {},
+          "2": {},
+          "3": {},
+          "4": {}
+        }
+      }
+    ]
+  },
+  "notes": ""
+},
+{
+  "_id": {
+    "$oid": "68fdbf0c3b40854bfa4a48a4"
+  },
+  "request_id": "0d31d6df-6080-4749-b6cb-54c01b40caf7",
+  "user_id": "c82f8ad6-223b-4754-b8e4-047be17b27da",
+  "query": "univ",
+  "description": "buat entitas mahasiswa dan mata kuliah",
+  "status": "complete",
+  "advisor_id": "d56578c8-32cb-4f4c-9e82-c038fe4db1aa",
+  "created_at": {
+    "$date": "2025-10-26T14:26:20.055Z"
+  },
+  "updated_at": {
+    "$date": "2025-10-26T14:28:55.502Z"
+  },
+  "completed_at": {
+    "$date": "2025-10-26T14:28:55.502Z"
+  },
+  "erd_result": {
+    "name": "univ",
+    "entities": [
+      {
+        "name": "Mahasiswa",
+        "attributes": [
+          "NIM",
+          "Nama",
+          "Jurusan",
+          "Kelas"
+        ],
+        "primary_key": "NIM"
+      },
+      {
+        "name": "Mata Kuliah",
+        "attributes": [
+          "Kd_Matkul",
+          "NIM",
+          "Nama_Matkul"
+        ],
+        "primary_key": "Kd_Matkul"
+      }
+    ],
+    "relationships": [
+      {
+        "entity1": "Mahasiswa",
+        "entity2": "Mata Kuliah",
+        "relation": "Memilih",
+        "type": "one-to-many",
+        "layout": "LR"
+      }
+    ]
+  },
+  "notes": ""
+},
+{
+  "_id": {
+    "$oid": "68ff54d0668782a0f996b206"
+  },
+  "request_id": "e54e4839-36a1-4310-bf2e-55ac40dc1e14",
+  "user_id": "c82f8ad6-223b-4754-b8e4-047be17b27da",
+  "query": "monitoring",
+  "description": "Tolong buat perancangan ERD untuk sistem monitoring fasilitas menggunakan qr code",
+  "status": "complete",
+  "advisor_id": "d56578c8-32cb-4f4c-9e82-c038fe4db1aa",
+  "created_at": {
+    "$date": "2025-10-27T19:17:36.835Z"
+  },
+  "updated_at": {
+    "$date": "2025-10-27T19:58:13.399Z"
+  },
+  "completed_at": {
+    "$date": "2025-10-27T19:58:13.399Z"
+  },
+  "erd_result": {
+    "name": "sistem_monitoring_peminjaman_fasilitas",
+    "entities": [
+      {
+        "name": "fakultas",
+        "attributes": [
+          "kode_fakultas",
+          "nama_fakultas"
+        ],
+        "primary_key": "kode_fakultas"
+      },
+      {
+        "name": "program_studi",
+        "attributes": [
+          "kode_prodi",
+          "nama_prodi",
+          "kode_fakultas"
+        ],
+        "primary_key": "kode_prodi"
+      },
+      {
+        "name": "role",
+        "attributes": [
+          "id_role",
+          "nama_role"
+        ],
+        "primary_key": "id_role"
+      },
+      {
+        "name": "peminjam",
+        "attributes": [
+          "id_peminjam",
+          "nama_peminjam",
+          "id_role",
+          "id_prodi",
+          "username",
+          "password",
+          "email"
+        ],
+        "primary_key": "id_peminjam"
+      },
+      {
+        "name": "peminjaman",
+        "attributes": [
+          "id_peminjaman",
+          "tanggal_pinjam",
+          "id_peminjam",
+          "id_fasilitas"
+        ],
+        "primary_key": "id_peminjaman"
+      },
+      {
+        "name": "pengembalian",
+        "attributes": [
+          "id_pengembalian",
+          "id_peminjaman",
+          "tanggal dikembalikan"
+        ],
+        "primary_key": "id_pengembalian"
+      },
+      {
+        "name": "jenis_validasi",
+        "attributes": [
+          "id_validasi",
+          "jenis_validasi"
+        ],
+        "primary_key": "id_validasi"
+      },
+      {
+        "name": "fasilitas",
+        "attributes": [
+          "id_fasilitas",
+          "nama_fasilitas",
+          "id_jenis_fasilitas",
+          "id_jenis_validasi"
+        ],
+        "primary_key": "id_fasilitas"
+      },
+      {
+        "name": "jenis_fasilitas",
+        "attributes": [
+          "id_jenis_fasilitas",
+          "jenis_fasilitas"
+        ],
+        "primary_key": "id_jenis_fasilitas"
+      },
+      {
+        "name": "riwayat_validasi_manual_peminjaman",
+        "attributes": [
+          "id_riwayat",
+          "id_peminjaman",
+          "tanggal_validasi",
+          "id_admin"
+        ],
+        "primary_key": "id_riwayat"
+      },
+      {
+        "name": "riwayat_validasi_manual",
+        "attributes": [
+          "id_validasi",
+          "jenis_validasi"
+        ],
+        "primary_key": "id_validasi"
+      },
+      {
+        "name": "riwayat_validasi_manual_pengembalian",
+        "attributes": [
+          "id_riwayat",
+          "tanggal_validasi",
+          "id_admin",
+          "id_pengembalian"
+        ],
+        "primary_key": "id_riwayat"
+      },
+      {
+        "name": "admin",
+        "attributes": [
+          "id_admin",
+          "nama_admin",
+          "username",
+          "password",
+          "email"
+        ],
+        "primary_key": "id_admin"
+      }
+    ],
+    "relationships": [
+      {
+        "entity1": "fakultas",
+        "entity2": "program_studi",
+        "relation": "memiliki",
+        "type": "one-to-many",
+        "layout": "BT"
+      },
+      {
+        "entity1": "program_studi",
+        "entity2": "peminjam",
+        "relation": "memiliki",
+        "type": "one-to-many",
+        "layout": "BT"
+      },
+      {
+        "entity1": "role",
+        "entity2": "peminjam",
+        "relation": "memiliki",
+        "type": "one-to-many",
+        "layout": "LR"
+      },
+      {
+        "entity1": "peminjam",
+        "entity2": "peminjaman",
+        "relation": "melakukan",
+        "type": "one-to-many",
+        "layout": "LR"
+      },
+      {
+        "entity1": "peminjaman",
+        "entity2": "pengembalian",
+        "relation": "memiliki",
+        "type": "one-to-many",
+        "layout": "LR"
+      },
+      {
+        "entity1": "jenis_validasi",
+        "entity2": "fasilitas",
+        "relation": "memiliki",
+        "type": "one-to-many",
+        "layout": "BT"
+      },
+      {
+        "entity1": "fasilitas",
+        "entity2": "jenis_fasilitas",
+        "relation": "memiliki",
+        "type": "many-to-one",
+        "layout": "LR"
+      },
+      {
+        "entity1": "fasilitas",
+        "entity2": "peminjaman",
+        "relation": "dipinjam",
+        "type": "one-to-many",
+        "layout": "BT"
+      },
+      {
+        "entity1": "peminjaman",
+        "entity2": "riwayat_validasi_manual_peminjaman",
+        "relation": "memerlukan",
+        "type": "one-to-many",
+        "layout": "BT"
+      },
+      {
+        "entity1": "admin",
+        "entity2": "riwayat_validasi_manual_peminjaman",
+        "relation": "mencatat",
+        "type": "one-to-many",
+        "layout": "LR"
+      },
+      {
+        "entity1": "riwayat_validasi_manual_peminjaman",
+        "entity2": "riwayat_validasi_manual",
+        "relation": "memiliki",
+        "type": "many-to-one",
+        "layout": "LR"
+      },
+      {
+        "entity1": "pengembalian",
+        "entity2": "riwayat_validasi_manual_pengembalian",
+        "relation": "memerlukan",
+        "type": "one-to-many",
+        "layout": "BT"
+      },
+      {
+        "entity1": "riwayat_validasi_manual",
+        "entity2": "riwayat_validasi_manual_pengembalian",
+        "relation": "memiliki",
+        "type": "one-to-many",
+        "layout": "LR"
+      }
+    ]
+  },
+  "notes": ""
+}]
