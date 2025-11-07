@@ -20,7 +20,8 @@ class RequestController:
             erd_request = RequestModel(
                 user_id=user_id,
                 query=data.get('query'),
-                description=data.get('description')
+                description=data.get('description'),
+                notes_from_user=data.get('notes_from_user')
             )
             
             # Validate request data
@@ -38,6 +39,7 @@ class RequestController:
                         "query": erd_request.query,
                         "description": erd_request.description,
                         "status": erd_request.status,
+                        "notes_from_user": erd_request.notes_from_user,
                         "created_at": erd_request.created_at.isoformat()
                     }
                 }), 201
@@ -67,7 +69,9 @@ class RequestController:
                     "created_at": req.created_at.isoformat() if req.created_at else None,
                     "updated_at": req.updated_at.isoformat() if req.updated_at else None,
                     "completed_at": req.completed_at.isoformat() if req.completed_at else None,
-                    "notes": req.notes
+                    "erd_id": req.erd_id,
+                    "notes_from_user": req.notes_from_user,
+                    "notes_from_advisor": req.notes_from_advisor
                 })
             
             return jsonify({"requests": requests}), 200
@@ -217,7 +221,9 @@ class RequestController:
                         "username": user.username if user else "Unknown",
                         "email": user.email if user else "Unknown"
                     },
-                    "notes": req.notes
+                    "erd_id": req.erd_id,
+                    "notes_from_user": req.notes_from_user,
+                    "notes_from_advisor": req.notes_from_advisor
                 })
             
             return jsonify({"requests": requests}), 200
@@ -253,25 +259,56 @@ class RequestController:
             if req.status != 'on_process':
                 return jsonify({"error": "Request tidak dalam status on_process"}), 400
             
-            # Complete request
-            erd_result = data.get('erd_result')
-            notes = data.get('notes', '')
+            # Get ERD data from request
+            erd_data = data.get('erd_data')
+            notes_from_advisor = data.get('notes_from_advisor', '')
             
+            if not erd_data:
+                return jsonify({"error": "ERD data diperlukan"}), 400
+            
+            # Import ERDModel
+            from models.erd_model import ERDModel
+            from services.recommendation_service import recommendation_service
+            
+            # Create ERD in ERD collection with mode "from_request"
+            erd_model = ERDModel(
+                name=erd_data.get('name'),
+                entities=erd_data.get('entities'),
+                relationships=erd_data.get('relationships'),
+                advisor_id=advisor_id,
+                mode="from_request",
+                request_id=request_id
+            )
+            
+            # Validate ERD
+            is_valid, message = erd_model.validate()
+            if not is_valid:
+                return jsonify({"error": f"ERD tidak valid: {message}"}), 400
+            
+            # Save ERD to database
+            erd_result = db.save_erd(erd_model.to_dict())
             if not erd_result:
-                return jsonify({"error": "ERD result diperlukan"}), 400
+                return jsonify({"error": "Gagal menyimpan ERD"}), 500
             
-            req.complete_request(erd_result, notes)
+            # Complete request with erd_id reference
+            req.complete_request(erd_model.erd_id, notes_from_advisor)
             
-            # Update in database
+            # Update request in database
             db.update_request(request_id, {
-                "erd_result": req.erd_result,
-                "notes": req.notes,
+                "erd_id": req.erd_id,
+                "notes_from_advisor": req.notes_from_advisor,
                 "status": req.status,
                 "completed_at": req.completed_at,
                 "updated_at": req.updated_at
             })
             
-            return jsonify({"message": "Request berhasil diselesaikan"}), 200
+            # Reload recommendation system
+            recommendation_service.reload_system()
+            
+            return jsonify({
+                "message": "Request berhasil diselesaikan",
+                "erd_id": erd_model.erd_id
+            }), 200
             
         except Exception as e:
             return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500

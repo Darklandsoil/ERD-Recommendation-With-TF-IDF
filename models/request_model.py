@@ -4,7 +4,7 @@ import uuid
 class RequestModel:
     """Request model for ERD creation requests"""
     
-    def __init__(self, user_id=None, query=None, description=None):
+    def __init__(self, user_id=None, query=None, description=None, notes_from_user=None):
         self.request_id = str(uuid.uuid4())
         self.user_id = user_id
         self.query = query
@@ -14,8 +14,9 @@ class RequestModel:
         self.created_at = datetime.now()
         self.updated_at = datetime.now()
         self.completed_at = None
-        self.erd_result = None  # ERD data when completed
-        self.notes = None  # advisor notes
+        self.erd_id = None  # Reference to ERD collection
+        self.notes_from_user = notes_from_user  # Notes from user
+        self.notes_from_advisor = None  # Notes from advisor
     
     def assign_advisor(self, advisor_id):
         """Assign advisor to request and change status to on_process"""
@@ -23,10 +24,10 @@ class RequestModel:
         self.status = "on_process"
         self.updated_at = datetime.now()
     
-    def complete_request(self, erd_result, notes=None):
-        """Complete request with ERD result"""
-        self.erd_result = erd_result
-        self.notes = notes
+    def complete_request(self, erd_id, notes_from_advisor=None):
+        """Complete request with ERD ID reference"""
+        self.erd_id = erd_id
+        self.notes_from_advisor = notes_from_advisor
         self.status = "complete"
         self.completed_at = datetime.now()
         self.updated_at = datetime.now()
@@ -51,8 +52,9 @@ class RequestModel:
             "created_at": self.created_at,
             "updated_at": self.updated_at,
             "completed_at": self.completed_at,
-            "erd_result": self.erd_result,
-            "notes": self.notes
+            "erd_id": self.erd_id,
+            "notes_from_user": self.notes_from_user,
+            "notes_from_advisor": self.notes_from_advisor
         }
     
     @classmethod
@@ -68,8 +70,9 @@ class RequestModel:
         request.created_at = data.get("created_at")
         request.updated_at = data.get("updated_at")
         request.completed_at = data.get("completed_at")
-        request.erd_result = data.get("erd_result")
-        request.notes = data.get("notes")
+        request.erd_id = data.get("erd_id")
+        request.notes_from_user = data.get("notes_from_user")
+        request.notes_from_advisor = data.get("notes_from_advisor")
         return request
     
     def validate(self):

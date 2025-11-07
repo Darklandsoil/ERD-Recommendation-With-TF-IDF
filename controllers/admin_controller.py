@@ -186,3 +186,35 @@ class AdminController:
             
         except Exception as e:
             return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
+    
+    @staticmethod
+    @jwt_required()
+    def get_statistics():
+        """Get system statistics"""
+        # Check if user is admin
+        error_response = AdminController.require_admin()
+        if error_response:
+            return error_response
+        
+        try:
+            stats = db.get_statistics()
+            return jsonify({"statistics": stats}), 200
+            
+        except Exception as e:
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
+    
+    @staticmethod
+    @jwt_required()
+    def get_advisor_monitoring():
+        """Get advisor activity monitoring"""
+        # Check if user is admin
+        error_response = AdminController.require_admin()
+        if error_response:
+            return error_response
+        
+        try:
+            activities = db.get_all_advisor_activities()
+            return jsonify({"advisor_activities": activities}), 200
+            
+        except Exception as e:
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500

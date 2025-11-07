@@ -40,34 +40,47 @@ class ERDController:
         })
     
     @staticmethod
+    @jwt_required()
     def add_erd():
-        """Add new ERD to database"""
-        data = request.json
-        
-        # Get advisor_id if provided (for direct creation by advisor)
-        advisor_id = data.get("advisor_id", None)
-        
-        # Create ERD model
-        erd_model = ERDModel(
-            name=data.get("name", ""),
-            entities=data.get("entities", []),
-            relationships=data.get("relationships", []),
-            advisor_id=advisor_id
-        )
-        
-        # Validate ERD data
-        is_valid, message = erd_model.validate()
-        if not is_valid:
-            return jsonify({"error": message}), 400
-        
-        # Save to database
-        result = db.save_erd(erd_model.to_dict())
-        if result:
-            # Reload recommendation system
-            recommendation_service.reload_system()
-            return jsonify({"message": "ERD berhasil disimpan"}), 201
-        else:
-            return jsonify({"error": "ERD dengan nama tersebut sudah ada"}), 409
+        """Add new ERD to database (manual mode for advisors)"""
+        try:
+            data = request.json
+            user_id = get_jwt_identity()
+            claims = get_jwt()
+            user_role = claims.get('role')
+            
+            # Only advisors can create manual ERDs
+            if user_role != 'advisor':
+                return jsonify({"error": "Hanya advisor yang dapat membuat ERD manual"}), 403
+            
+            # Create ERD model with manual mode
+            erd_model = ERDModel(
+                name=data.get("name", ""),
+                entities=data.get("entities", []),
+                relationships=data.get("relationships", []),
+                advisor_id=user_id,
+                mode="manual"
+            )
+            
+            # Validate ERD data
+            is_valid, message = erd_model.validate()
+            if not is_valid:
+                return jsonify({"error": message}), 400
+            
+            # Save to database
+            result = db.save_erd(erd_model.to_dict())
+            if result:
+                # Reload recommendation system
+                recommendation_service.reload_system()
+                return jsonify({
+                    "message": "ERD berhasil disimpan",
+                    "erd_id": erd_model.erd_id
+                }), 201
+            else:
+                return jsonify({"error": "Gagal menyimpan ERD"}), 500
+                
+        except Exception as e:
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
     
     @staticmethod
     def list_erds():
@@ -165,35 +178,145 @@ class ERDController:
             if user_role != 'advisor':
                 return jsonify({"error": "Hanya advisor yang dapat mengakses ini"}), 403
             
-            erds = db.get_erds_by_advisor(user_id)
+            # Get ERDs from ERD collection by advisor_id
+            erds = db.get_erds_by_advisor_id(user_id)
             erd_list = []
             
-            for erd in erds:
-                erd_result = erd.get('erd_result')
-                
-                #jika tidak ada erd result maka skip
-                if not erd_result:
-                    continue
-                
-                entities = erd_result.get("entities", [])
-                relationships = erd_result.get("relationships", [])
+            for erd_data in erds:
+                entities = erd_data.get("entities", [])
+                relationships = erd_data.get("relationships", [])
         
                 erd_list.append({
-                    "nama" : erd_result.get("name"),
-                    "entity_count" : len(entities),
-                    "relationship_count" : len(relationships),
-                    "created_at" : erd.get('created_at')
+                    "erd_id": erd_data.get("erd_id"),
+                    "name": erd_data.get("name"),
+                    "display_name": erd_data.get("name", "").replace('_', ' ').title(),
+                    "entity_count": len(entities),
+                    "relationship_count": len(relationships),
+                    "mode": erd_data.get("mode"),
+                    "created_at": erd_data.get("created_at").isoformat() if erd_data.get("created_at") else None,
+                    "updated_at": erd_data.get("updated_at").isoformat() if erd_data.get("updated_at") else None
                 })
             
             return jsonify({"erds": erd_list}), 200
             
         except Exception as e:
-             print(f"Error in get_advisor_erds: {str(e)}")  # Untuk debugging
-             return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
-
-        """Reload recommendation system"""
+            print(f"Error in get_advisor_erds: {str(e)}")  # Untuk debugging
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
+    
+    @staticmethod
+    @jwt_required()
+    def get_erd_detail(erd_id):
+        """Get ERD detail by ID"""
         try:
-            recommendation_service.reload_system()
-            return jsonify({"message": "Sistem rekomendasi berhasil di-reload"}), 200
+            user_id = get_jwt_identity()
+            claims = get_jwt()
+            user_role = claims.get('role')
+            
+            # Find ERD
+            erd_data = db.find_erd_by_id(erd_id)
+            if not erd_data:
+                return jsonify({"error": "ERD tidak ditemukan"}), 404
+            
+            # Check access: advisors can only view their own ERDs
+            if user_role == 'advisor' and erd_data.get('advisor_id') != user_id:
+                return jsonify({"error": "Anda tidak memiliki akses ke ERD ini"}), 403
+            
+            return jsonify({
+                "erd": {
+                    "erd_id": erd_data.get("erd_id"),
+                    "name": erd_data.get("name"),
+                    "entities": erd_data.get("entities"),
+                    "relationships": erd_data.get("relationships"),
+                    "mode": erd_data.get("mode"),
+                    "advisor_id": erd_data.get("advisor_id"),
+                    "request_id": erd_data.get("request_id"),
+                    "created_at": erd_data.get("created_at").isoformat() if erd_data.get("created_at") else None,
+                    "updated_at": erd_data.get("updated_at").isoformat() if erd_data.get("updated_at") else None
+                }
+            }), 200
+            
         except Exception as e:
-            return jsonify({"error": f"Gagal reload sistem: {str(e)}"}), 500
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
+    
+    @staticmethod
+    @jwt_required()
+    def update_erd(erd_id):
+        """Update ERD (only by advisor who created it)"""
+        try:
+            user_id = get_jwt_identity()
+            claims = get_jwt()
+            user_role = claims.get('role')
+            data = request.json
+            
+            if user_role != 'advisor':
+                return jsonify({"error": "Hanya advisor yang dapat mengedit ERD"}), 403
+            
+            # Find ERD
+            erd_data = db.find_erd_by_id(erd_id)
+            if not erd_data:
+                return jsonify({"error": "ERD tidak ditemukan"}), 404
+            
+            # Check if advisor owns the ERD
+            if erd_data.get('advisor_id') != user_id:
+                return jsonify({"error": "Anda hanya dapat mengedit ERD yang Anda buat"}), 403
+            
+            # Prepare update data
+            from datetime import datetime
+            update_data = {
+                "updated_at": datetime.now()
+            }
+            
+            if data.get('name'):
+                from utils.text_processing import normalize_erd_name
+                update_data['name'] = normalize_erd_name(data.get('name'))
+            
+            if data.get('entities'):
+                update_data['entities'] = data.get('entities')
+            
+            if data.get('relationships'):
+                update_data['relationships'] = data.get('relationships')
+            
+            # Update ERD
+            result = db.update_erd(erd_id, update_data)
+            if result.modified_count > 0:
+                # Reload recommendation system
+                recommendation_service.reload_system()
+                return jsonify({"message": "ERD berhasil diupdate"}), 200
+            else:
+                return jsonify({"message": "Tidak ada perubahan"}), 200
+            
+        except Exception as e:
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
+    
+    @staticmethod
+    @jwt_required()
+    def delete_erd_by_id(erd_id):
+        """Delete ERD by ID (only by advisor who created it)"""
+        try:
+            user_id = get_jwt_identity()
+            claims = get_jwt()
+            user_role = claims.get('role')
+            
+            if user_role != 'advisor':
+                return jsonify({"error": "Hanya advisor yang dapat menghapus ERD"}), 403
+            
+            # Find ERD
+            erd_data = db.find_erd_by_id(erd_id)
+            if not erd_data:
+                return jsonify({"error": "ERD tidak ditemukan"}), 404
+            
+            # Check if advisor owns the ERD
+            if erd_data.get('advisor_id') != user_id:
+                return jsonify({"error": "Anda hanya dapat menghapus ERD yang Anda buat"}), 403
+            
+            # Delete ERD
+            result = db.delete_erd_by_id(erd_id)
+            if result.deleted_count > 0:
+                # Reload recommendation system
+                recommendation_service.reload_system()
+                return jsonify({"message": "ERD berhasil dihapus"}), 200
+            else:
+                return jsonify({"error": "Gagal menghapus ERD"}), 500
+            
+        except Exception as e:
+            return jsonify({"error": f"Terjadi kesalahan: {str(e)}"}), 500
