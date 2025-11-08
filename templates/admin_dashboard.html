@@ -22,19 +22,65 @@
     </nav>
 
     <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-menu">
+                <a href="#statistics" class="menu-item active" data-tab="statistics" onclick="switchTab('statistics')">
+                    <i class='bx bx-bar-chart-alt-2'></i>
+                    <span>Statistik</span>
+                </a>
+                <a href="#advisors" class="menu-item" data-tab="advisors" onclick="switchTab('advisors')">
+                    <i class='bx bx-user-circle'></i>
+                    <span>Manajemen Pakar</span>
+                </a>
+                <a href="#monitoring" class="menu-item" data-tab="monitoring" onclick="switchTab('monitoring')">
+                    <i class='bx bx-line-chart'></i>
+                    <span>Monitoring Advisor</span>
+                </a>
+            </div>
+        </aside>
+
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Advisor Management Section -->
-            <div class="content-header">
-                <h2>Manajemen Pakar (Advisor)</h2>
-                <button onclick="showAddAdvisorModal()" class="btn-primary">
-                    <i class='bx bx-plus'></i> Tambah Pakar Baru
-                </button>
+            <!-- Statistics Tab -->
+            <div id="statistics-tab" class="tab-content active">
+                <div class="content-header">
+                    <h2>📊 Statistik Sistem</h2>
+                    <p>Ringkasan data sistem ERD Generator</p>
+                </div>
+
+                <div class="statistics-section">
+                    <div id="statisticsLoading" class="loading">Memuat statistik...</div>
+                    <div id="statisticsCards" class="stats-grid"></div>
+                </div>
             </div>
 
-            <div class="advisors-section">
-                <div id="advisorsLoading" class="loading">Memuat data pakar...</div>
-                <div id="advisorsTable" class="table-container"></div>
+            <!-- Advisor Management Tab -->
+            <div id="advisors-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>Manajemen Pakar (Advisor)</h2>
+                    <button onclick="showAddAdvisorModal()" class="btn-primary">
+                        <i class='bx bx-plus'></i> Tambah Pakar Baru
+                    </button>
+                </div>
+
+                <div class="advisors-section">
+                    <div id="advisorsLoading" class="loading">Memuat data pakar...</div>
+                    <div id="advisorsTable" class="table-container"></div>
+                </div>
+            </div>
+
+            <!-- Monitoring Tab -->
+            <div id="monitoring-tab" class="tab-content">
+                <div class="content-header">
+                    <h2>📈 Monitoring Aktivitas Advisor</h2>
+                    <p>Pantau aktivitas dan produktivitas advisor</p>
+                </div>
+
+                <div class="monitoring-section">
+                    <div id="monitoringLoading" class="loading">Memuat data monitoring...</div>
+                    <div id="monitoringTable" class="table-container"></div>
+                </div>
             </div>
         </main>
     </div>
@@ -47,6 +93,10 @@
                 <button onclick="closeAddAdvisorModal()" class="close-btn">&times;</button>
             </div>
             <form id="addAdvisorForm" class="modal-form">
+                <div class="form-group">
+                    <label for="newFullname">Nama Lengkap</label>
+                    <input type="text" id="newFullname" required placeholder="Nama Lengkap Pakar">
+                </div>
                 <div class="form-group">
                     <label for="newUsername">Username</label>
                     <input type="text" id="newUsername" required placeholder="Username pakar (min. 3 karakter)">
@@ -97,5 +147,57 @@
     </div>
 
     <script src="{{ url_for('static', filename='js/admin_dashboard.js') }}"></script>
+    
+    <script>
+        // Switch Tab Function
+        function switchTab(tabName) {
+            // Remove active class from all tabs and menu items
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Add active class to selected tab and menu item
+            const selectedTab = document.getElementById(tabName + '-tab');
+            const selectedMenuItem = document.querySelector(`[data-tab="${tabName}"]`);
+            
+            if (selectedTab) selectedTab.classList.add('active');
+            if (selectedMenuItem) selectedMenuItem.classList.add('active');
+
+            // Load data based on tab
+            if (tabName === 'statistics' && typeof loadStatistics === 'function') {
+                loadStatistics();
+            } else if (tabName === 'advisors' && typeof loadAdvisors === 'function') {
+                loadAdvisors();
+            } else if (tabName === 'monitoring' && typeof loadAdvisorMonitoring === 'function') {
+                loadAdvisorMonitoring();
+            }
+
+            // Update URL hash without scrolling
+            history.pushState(null, null, '#' + tabName);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle browser back/forward with tabs
+            window.addEventListener('popstate', () => {
+                const hash = window.location.hash.replace('#', '');
+                if (hash && ['statistics', 'advisors', 'monitoring'].includes(hash)) {
+                    switchTab(hash);
+                }
+            });
+
+            // Set initial tab from URL hash
+            const initialHash = window.location.hash.replace('#', '');
+            if (initialHash && ['statistics', 'advisors', 'monitoring'].includes(initialHash)) {
+                switchTab(initialHash);
+            } else {
+                // Default to statistics tab
+                 switchTab('statistics');
+            }
+        });
+    </script>
 </body>
 </html>

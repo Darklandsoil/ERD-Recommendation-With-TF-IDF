@@ -134,11 +134,12 @@ function initRegisterForm() {
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
         
+        const fullname = document.getElementById('fullname').value.trim()
         const username = document.getElementById('username').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         
-        if (!username || !email || !password) {
+        if (!fullname || !username || !email || !password) {
             showStatus('registerStatus', 'Semua field harus diisi', 'error');
             return;
         }
@@ -159,7 +160,7 @@ function initRegisterForm() {
         try {
             const response = await apiCall('/auth/register', {
                 method: 'POST',
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ fullname, username, email, password })
             });
             
             const data = await response.json();

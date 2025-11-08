@@ -5,8 +5,9 @@ import uuid
 class UserModel:
     """User model for authentication and role management"""
     
-    def __init__(self, username=None, email=None, password=None, role="user"):
+    def __init__(self, fullname=None, username=None, email=None, password=None, role="user"):
         self.user_id = str(uuid.uuid4())
+        self.fullname = fullname
         self.username = username
         self.email = email
         self.password_hash = None
@@ -30,6 +31,7 @@ class UserModel:
         """Convert to dictionary for MongoDB storage"""
         return {
             "user_id": self.user_id,
+            "fullname": self.fullname,
             "username": self.username,
             "email": self.email,
             "password_hash": self.password_hash,
@@ -43,6 +45,7 @@ class UserModel:
         """Create UserModel from dictionary"""
         user = cls()
         user.user_id = data.get("user_id")
+        user.fullname = data.get("fullname")
         user.username = data.get("username")
         user.email = data.get("email")
         user.password_hash = data.get("password_hash")

@@ -5,14 +5,14 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     UPLOAD_FOLDER = "static/image"
     MONGODB_URI = os.environ.get('MONGODB_URI') or "mongodb://localhost:27017/"
-    DATABASE_NAME = "Rekom_ERD"
-    COLLECTION_NAME = "erd"
+    DATABASE_NAME = "RECOMMENDATION_ERD"
     
     # JWT Configuration
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-key-change-in-production'
     JWT_ACCESS_TOKEN_EXPIRES = False  # Tidak expire untuk development
     
     # Collections
+    ERD_COLLECTION = "erd"
     USERS_COLLECTION = "users"
     REQUESTS_COLLECTION = "requests"
     

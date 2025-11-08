@@ -3,7 +3,6 @@
 // Check authentication
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
-    loadAdvisors();
 });
 
 function checkAuth() {
@@ -23,6 +22,190 @@ function logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     window.location.href = '/login';
+}
+
+// ==========================================
+// STATISTICS FUNCTIONS
+// ==========================================
+
+// Load system statistics
+async function loadStatistics() {
+    const loadingEl = document.getElementById('statisticsLoading');
+    const cardsEl = document.getElementById('statisticsCards');
+    
+    loadingEl.style.display = 'block';
+    cardsEl.innerHTML = '';
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/admin/api/statistics', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to load statistics');
+        }
+        
+        const data = await response.json();
+        loadingEl.style.display = 'none';
+        
+        renderStatistics(data.statistics);
+        
+    } catch (error) {
+        console.error('Error loading statistics:', error);
+        loadingEl.innerHTML = '<p style="color: var(--error-color);">Gagal memuat statistik</p>';
+    }
+}
+
+function renderStatistics(stats) {
+    const cardsEl = document.getElementById('statisticsCards');
+    
+    const statsData = [
+        {
+            icon: '👥',
+            label: 'Total User',
+            value: stats.total_users,
+            color: '#3b82f6'
+        },
+        {
+            icon: '🎓',
+            label: 'Total Advisor',
+            value: stats.total_advisors,
+            color: '#10b981'
+        },
+        {
+            icon: '📋',
+            label: 'Total Request',
+            value: stats.total_requests,
+            color: '#f59e0b'
+        },
+        {
+            icon: '🗂️',
+            label: 'Total ERD',
+            value: stats.total_erds,
+            color: '#8b5cf6'
+        },
+        {
+            icon: '⏳',
+            label: 'Request Pending',
+            value: stats.pending_requests,
+            color: '#ef4444'
+        },
+        {
+            icon: '✅',
+            label: 'Request Selesai',
+            value: stats.completed_requests,
+            color: '#10b981'
+        }
+    ];
+    
+    statsData.forEach(stat => {
+        const card = document.createElement('div');
+        card.className = 'stat-card';
+        card.style.borderLeftColor = stat.color;
+        
+        card.innerHTML = `
+            <div class="stat-icon" style="background: ${stat.color}20; color: ${stat.color};">
+                ${stat.icon}
+            </div>
+            <div class="stat-info">
+                <div class="stat-label">${stat.label}</div>
+                <div class="stat-value">${stat.value}</div>
+            </div>
+        `;
+        
+        cardsEl.appendChild(card);
+    });
+}
+
+// ==========================================
+// ADVISOR MONITORING FUNCTIONS
+// ==========================================
+
+// Load advisor monitoring data
+async function loadAdvisorMonitoring() {
+    const loadingEl = document.getElementById('monitoringLoading');
+    const tableEl = document.getElementById('monitoringTable');
+    
+    loadingEl.style.display = 'block';
+    tableEl.innerHTML = '';
+    
+    try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('/admin/api/advisor-monitoring', {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Failed to load advisor monitoring');
+        }
+        
+        const data = await response.json();
+        loadingEl.style.display = 'none';
+        
+        renderAdvisorMonitoring(data.advisor_activities);
+        
+    } catch (error) {
+        console.error('Error loading advisor monitoring:', error);
+        loadingEl.innerHTML = '<p style="color: var(--error-color);">Gagal memuat data monitoring</p>';
+    }
+}
+
+function renderAdvisorMonitoring(activities) {
+    const tableEl = document.getElementById('monitoringTable');
+    
+    if (activities.length === 0) {
+        tableEl.innerHTML = `
+            <div class="empty-state">
+                <i class='bx bx-user-x'></i>
+                <p>Belum ada aktivitas advisor</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let tableHTML = `
+        <table class="monitoring-table">
+            <thead>
+                <tr>
+                    <th>Nama Lengkap</th>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Total ERD Dibuat</th>
+                    <th>Request Selesai</th>
+                    <th>Request On Process</th>
+                    <th>Total Aktivitas</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    
+    activities.forEach(activity => {
+        const totalActivity = activity.total_erds + activity.completed_requests;
+        
+        tableHTML += `
+            <tr>
+                <td><strong>${activity.fullname}</strong></td>
+                <td><strong>${activity.username}</strong></td>
+                <td>${activity.email}</td>
+                <td><span class="badge badge-primary">${activity.total_erds}</span></td>
+                <td><span class="badge badge-success">${activity.completed_requests}</span></td>
+                <td><span class="badge badge-warning">${activity.in_progress_requests}</span></td>
+                <td><strong>${totalActivity}</strong></td>
+            </tr>
+        `;
+    });
+    
+    tableHTML += `
+            </tbody>
+        </table>
+    `;
+    
+    tableEl.innerHTML = tableHTML;
 }
 
 // Load all advisors
@@ -60,6 +243,7 @@ async function loadAdvisors() {
             <table class="advisors-table">
                 <thead>
                     <tr>
+                        <th>Nama Lengkap</th>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Tanggal Dibuat</th>
@@ -76,6 +260,7 @@ async function loadAdvisors() {
             
             tableHTML += `
                 <tr>
+                    <td>${advisor.fullname}</td>
                     <td>${advisor.username}</td>
                     <td>${advisor.email}</td>
                     <td>${advisor.created_at || '-'}</td>
@@ -124,6 +309,7 @@ function closeAddAdvisorModal() {
 document.getElementById('addAdvisorForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    const fullname = document.getElementById('newFullname').value
     const username = document.getElementById('newUsername').value;
     const email = document.getElementById('newEmail').value;
     const password = document.getElementById('newPassword').value;
@@ -136,7 +322,7 @@ document.getElementById('addAdvisorForm').addEventListener('submit', async funct
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ username, email, password })
+            body: JSON.stringify({ fullname, username, email, password })
         });
         
         const data = await response.json();
@@ -162,6 +348,7 @@ function editAdvisor(advisor) {
     modal.classList.add('active');
     
     document.getElementById('editUserId').value = advisor.user_id;
+    document.getElementById('editFullname').value = advisor.fullname;
     document.getElementById('editUsername').value = advisor.username;
     document.getElementById('editEmail').value = advisor.email;
     document.getElementById('editPassword').value = '';
@@ -179,11 +366,12 @@ document.getElementById('editAdvisorForm').addEventListener('submit', async func
     e.preventDefault();
     
     const user_id = document.getElementById('editUserId').value;
+    const fullname = document.getElementById('editFullname').value;
     const username = document.getElementById('editUsername').value;
     const email = document.getElementById('editEmail').value;
     const password = document.getElementById('editPassword').value;
     
-    const updateData = { user_id, username, email };
+    const updateData = { user_id, fullname, username, email };
     if (password) {
         updateData.password = password;
     }

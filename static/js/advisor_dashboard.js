@@ -245,7 +245,7 @@ async function viewRequestDetails(requestId, status) {
         // In a real app, you might want a separate API call
         showRequestModal(requestId, status);
     } catch (error) {
-        alert('Gagal memuat detail request');
+        showErrorPopup('Gagal memuat detail request');
         console.error('Error:', error);
     }
 }
@@ -279,27 +279,32 @@ function closeRequestModal() {
 
 // Assign request functions
 async function assignRequestFromList(requestId) {
-    if (!confirm('Yakin ingin mengambil request ini?')) return;
-    
-    try {
-        const response = await apiCall(`/api/requests/${requestId}/assign`, {
-            method: 'PUT'
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            alert('Request berhasil diambil!');
-            loadPendingRequests();
-            // Switch to assigned tab
-            document.querySelector('[data-tab="assigned"]').click();
-        } else {
-            alert(data.error || 'Gagal mengambil request');
+    showWarningPopup(
+        'Konfirmasi',
+        'Yakin ingin mengambil request ini?',
+        async (confirmed) => {
+            if (!confirmed) return;
+            
+            try {
+                const response = await apiCall(`/api/requests/${requestId}/assign`, {
+                    method: 'PUT'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccessPopup('Berhasil!', 'Request berhasil diambil!');
+                    loadPendingRequests();
+                    document.querySelector('[data-tab="assigned"]').click();
+                } else {
+                    showErrorPopup('Gagal!', data.error || 'Gagal mengambil request');
+                }
+            } catch (error) {
+                showErrorPopup('Gagal!', 'Gagal mengambil request');
+                console.error('Error:', error);
+            }
         }
-    } catch (error) {
-        alert('Gagal mengambil request');
-        console.error('Error:', error);
-    }
+    );
 }
 
 async function handleAssignRequest() {
@@ -317,7 +322,7 @@ function startERDCreation(requestId) {
 
 function openERDCreationModal() {
     if (!currentRequest) {
-        alert('Pilih request terlebih dahulu');
+        showErrorPopup('Pilih request terlebih dahulu');
         return;
     }
     
@@ -331,6 +336,17 @@ function openERDCreationModal() {
 function closeERDCreationModal() {
     document.getElementById('erdCreationModal').style.display = 'none';
     resetERDForm();
+    editingErdId = null;
+    currentRequest = null;
+    
+    // Reset submit button text
+    const submitBtn = document.querySelector('#erdForm button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.textContent = '💾 Simpan & Kirim ERD';
+    }
+    
+    // Reset modal title
+    document.getElementById('erdCreationTitle').textContent = 'Buat ERD';
 }
 
 // ERD Form Management
@@ -611,17 +627,12 @@ function updateRelationshipOptions() {
 async function handleERDSubmission(event) {
     event.preventDefault();
     
-    if (!currentRequest) {
-        alert('Tidak ada request yang dipilih');
-        return;
-    }
-    
     // Collect form data
     const erdName = document.getElementById('erdName').value.trim();
     const erdNotes = document.getElementById('erdNotes').value.trim();
     
     if (!erdName) {
-        alert('Nama ERD harus diisi');
+        showErrorPopup('Nama ERD harus diisi');
         return;
     }
     
@@ -670,7 +681,7 @@ async function handleERDSubmission(event) {
     });
     
     if (entitiesData.length === 0) {
-        alert('Minimal harus ada satu entitas');
+        showErrorPopup('Minimal harus ada satu entitas');
         return;
     }
     
@@ -682,38 +693,71 @@ async function handleERDSubmission(event) {
     };
     
     try {
-        // Save ERD to database first
-        const saveResponse = await apiCall('/api/add-erd', {
-            method: 'POST',
-            body: JSON.stringify(erdData)
-        });
-        
-        if (!saveResponse.ok) {
-            const errorData = await saveResponse.json();
-            throw new Error(errorData.error || 'Gagal menyimpan ERD');
+        // Check if this is an edit operation
+        if (editingErdId) {
+            await updateERD(editingErdId, erdData);
+            return;
         }
         
-        // Complete the request
-        const completeResponse = await apiCall(`/api/requests/${currentRequest.request_id}/complete`, {
-            method: 'PUT',
-            body: JSON.stringify({
-                erd_result: erdData,
-                notes: erdNotes
-            })
-        });
-        
-        if (completeResponse.ok) {
-            alert('ERD berhasil dibuat dan dikirim ke user!');
-            closeERDCreationModal();
-            // Switch to assigned tab to see updated status
-            document.querySelector('[data-tab="assigned"]').click();
+        // Check if this is manual ERD creation or from request
+        if (currentRequest) {
+            // Mode: from_request - Include request_id
+            erdData.mode = 'from_request';
+            erdData.request_id = currentRequest.request_id;
+            
+            // Save ERD to database first
+            const saveResponse = await apiCall('/api/add-erd', {
+                method: 'POST',
+                body: JSON.stringify(erdData)
+            });
+            
+            if (!saveResponse.ok) {
+                const errorData = await saveResponse.json();
+                throw new Error(errorData.error || 'Gagal menyimpan ERD');
+            }
+            
+            const saveData = await saveResponse.json();
+            
+            // Complete the request with ERD ID
+            const completeResponse = await apiCall(`/api/requests/${currentRequest.request_id}/complete`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    erd_id: saveData.erd_id,
+                    notes: erdNotes
+                })
+            });
+            
+            if (completeResponse.ok) {
+                showSuccessPopup('ERD berhasil dibuat dan dikirim ke user!');
+                closeERDCreationModal();
+                // Switch to assigned tab to see updated status
+                document.querySelector('[data-tab="assigned"]').click();
+            } else {
+                const errorData = await completeResponse.json();
+                showErrorPopup(errorData.error || 'Gagal menyelesaikan request');
+            }
         } else {
-            const errorData = await completeResponse.json();
-            alert(errorData.error || 'Gagal menyelesaikan request');
+            // Mode: manual - Direct ERD creation without request
+            erdData.mode = 'manual';
+            
+            const saveResponse = await apiCall('/api/add-erd', {
+                method: 'POST',
+                body: JSON.stringify(erdData)
+            });
+            
+            if (!saveResponse.ok) {
+                const errorData = await saveResponse.json();
+                throw new Error(errorData.error || 'Gagal menyimpan ERD');
+            }
+            
+            showSuccessPopup('ERD manual berhasil dibuat!');
+            closeERDCreationModal();
+            // Reload ERD list in create tab
+            loadMyERDs();
         }
         
     } catch (error) {
-        alert(`Gagal membuat ERD: ${error.message}`);
+        showErrorPopup(`Gagal membuat ERD: ${error.message}`);
         console.error('Error:', error);
     }
 }
@@ -836,9 +880,20 @@ function renderMyERDs(erds) {
         const erdCard = document.createElement('div');
         erdCard.className = 'erd-card';
         
+        // Format date
+        const createdDate = erd.created_at ? new Date(erd.created_at).toLocaleDateString('id-ID') : '-';
+        
+        // Badge untuk mode
+        const modeBadge = erd.mode === 'manual' 
+            ? '<span class="mode-badge manual">Manual</span>' 
+            : '<span class="mode-badge from-request">Dari Request</span>';
+        
         erdCard.innerHTML = `
             <div class="erd-card-header">
-                <div class="erd-card-title">${erd.nama}</div>
+                <div class="erd-card-title-row">
+                    <div class="erd-card-title">${erd.display_name}</div>
+                    ${modeBadge}
+                </div>
                 <div class="erd-card-stats">
                     <div class="erd-card-stat">
                         <span>📋</span>
@@ -850,15 +905,18 @@ function renderMyERDs(erds) {
                     </div>
                     <div class="erd-card-stat">
                         <span>📆</span>
-                        <span>${erd.created_at} Tanggal Buat</span>
+                        <span>${createdDate}</span>
                     </div>
                 </div>
             </div>
             <div class="erd-card-actions">
                 <button class="btn-view-erd" onclick="viewERDImage('${erd.name}')">
-                    👁️ Lihat ERD
+                    👁️ Lihat
                 </button>
-                <button class="btn-delete-erd" onclick="deleteERD('${erd.name}', '${erd.display_name}')">
+                <button class="btn-edit-erd" onclick="editERD('${erd.erd_id}')">
+                    ✏️ Edit
+                </button>
+                <button class="btn-delete-erd" onclick="deleteERDById('${erd.erd_id}', '${erd.display_name}')">
                     🗑️ Hapus
                 </button>
             </div>
@@ -871,18 +929,17 @@ function renderMyERDs(erds) {
 // Open direct ERD creation modal
 function openDirectERDCreation() {
     currentRequest = null; // No request association
-    entities = [];
-    relationships = [];
-    entityCounter = 0;
-    relationshipCounter = 0;
+    editingErdId = null; // Clear editing context
     
     // Reset form
-    document.getElementById('erdForm').reset();
-    document.getElementById('entitiesContainer').innerHTML = '';
-    document.getElementById('relationshipsContainer').innerHTML = '';
+    resetERDForm();
     
     // Change modal title
     document.getElementById('erdCreationTitle').textContent = 'Buat ERD Baru (Langsung)';
+    
+    // Change submit button text
+    const submitBtn = document.querySelector('#erdForm button[type="submit"]');
+    submitBtn.textContent = '💾 Simpan & Kirim ERD';
     
     // Show modal
     document.getElementById('erdCreationModal').style.display = 'block';
@@ -898,100 +955,223 @@ async function viewERDImage(erdName) {
             // Open in new window
             window.open(data.erd_image, '_blank');
         } else {
-            alert(`Gagal membuka ERD: ${data.error}`);
+            showErrorPopup(`Gagal membuka ERD: ${data.error}`);
         }
     } catch (error) {
-        alert('Gagal membuka ERD');
+        showErrorPopup('Gagal membuka ERD');
         console.error('Error:', error);
     }
 }
 
-// Delete ERD
-async function deleteERD(erdName, displayName) {
-    if (!confirm(`Apakah Anda yakin ingin menghapus ERD "${displayName}"?`)) {
-        return;
-    }
-    
+// Delete ERD by ID
+async function deleteERDById(erdId, displayName) {
+    showWarningPopup(
+        'Konfirmasi Hapus',
+        `Apakah Anda yakin ingin menghapus ERD "${displayName}"? Tindakan ini tidak dapat dibatalkan.`,
+        async (confirmed) => {
+            if (!confirmed) return;
+            
+            try {
+                const response = await apiCall(`/api/erd/${erdId}`, {
+                    method: 'DELETE'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccessPopup('Berhasil!', 'ERD berhasil dihapus!');
+                    loadMyERDs();
+                } else {
+                    showErrorPopup('Gagal!', data.error || 'Gagal menghapus ERD');
+                }
+            } catch (error) {
+                showErrorPopup('Gagal!', 'Gagal menghapus ERD');
+                console.error('Error:', error);
+            }
+        }
+    );
+}
+
+// Edit ERD
+let editingErdId = null;
+
+async function editERD(erdId) {
     try {
-        const response = await apiCall('/api/delete-erd', 'DELETE', {
-            erd_name: erdName
+        const response = await apiCall(`/api/erd/${erdId}`);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            showErrorPopup(`Gagal memuat ERD: ${data.error}`);
+            return;
+        }
+        
+        const erd = data.erd;
+        editingErdId = erdId;
+        currentRequest = null; // Clear request context for manual edit
+        
+        // Reset form
+        resetERDForm();
+        
+        // Populate form with ERD data
+        document.getElementById('erdName').value = erd.name;
+        document.getElementById('erdNotes').value = '';
+        
+        // Change modal title
+        document.getElementById('erdCreationTitle').textContent = 'Edit ERD';
+        
+        // Populate entities
+        erd.entities.forEach((entity, index) => {
+            addEntity();
+            const entityDiv = document.querySelector(`[data-entity-id="entity_${entityCounter}"]`);
+            entityDiv.querySelector('.entity-name').value = entity.name;
+            entityDiv.querySelector('.entity-pk').value = entity.primary_key || '';
+            
+            // Update entity in array
+            entities[entities.length - 1].name = entity.name;
+            entities[entities.length - 1].attributes = entity.attributes || [];
+            entities[entities.length - 1].primary_key = entity.primary_key || '';
+            
+            // Add attributes
+            (entity.attributes || []).forEach(attr => {
+                const input = entityDiv.querySelector('.new-attribute');
+                input.value = attr;
+                addAttribute(`entity_${entityCounter}`);
+            });
+        });
+        
+        // Update relationship options first
+        updateRelationshipOptions();
+        
+        // Populate relationships
+        erd.relationships.forEach(rel => {
+            addRelationship();
+            const relDiv = document.querySelector(`[data-relationship-id="relationship_${relationshipCounter}"]`);
+            relDiv.querySelector('.relationship-entity1').value = rel.entity1;
+            relDiv.querySelector('.relationship-entity2').value = rel.entity2;
+            relDiv.querySelector('.relationship-name').value = rel.relation;
+            relDiv.querySelector('.relationship-type').value = rel.type;
+            relDiv.querySelector('.relationship-layout').value = rel.layout;
+        });
+        
+        // Change submit button text
+        const submitBtn = document.querySelector('#erdForm button[type="submit"]');
+        submitBtn.textContent = '💾 Update ERD';
+        
+        // Show modal
+        document.getElementById('erdCreationModal').style.display = 'block';
+        
+    } catch (error) {
+        showErrorPopup('Gagal memuat ERD untuk diedit');
+        console.error('Error:', error);
+    }
+}
+
+// Update ERD
+async function updateERD(erdId, erdData) {
+    try {
+        const response = await apiCall(`/api/erd/${erdId}`, {
+            method: 'PUT',
+            body: JSON.stringify(erdData)
         });
         
         const data = await response.json();
         
         if (response.ok) {
-            alert('ERD berhasil dihapus!');
-            loadMyERDs(); // Reload the list
+            showSuccessPopup('ERD berhasil diupdate!');
+            closeERDCreationModal();
+            loadMyERDs();
+            editingErdId = null;
         } else {
-            alert(`Gagal menghapus ERD: ${data.error}`);
+            showErrorPopup(`Gagal mengupdate ERD: ${data.error}`);
         }
     } catch (error) {
-        alert('Gagal menghapus ERD');
+        showErrorPopup('Gagal mengupdate ERD');
         console.error('Error:', error);
     }
 }
 
-// Override submitERD to handle both request-based and direct creation
-const originalSubmitERD = window.submitERD;
-window.submitERD = async function() {
-    const erdName = document.getElementById('erdName').value.trim();
-    const erdNotes = document.getElementById('erdNotes').value.trim();
-    
-    if (!erdName) {
-        alert('Nama ERD harus diisi!');
-        return;
-    }
-    
-    if (entities.length === 0) {
-        alert('Minimal harus ada 1 entitas!');
-        return;
-    }
-    
-    if (relationships.length === 0) {
-        alert('Minimal harus ada 1 relasi!');
-        return;
-    }
-    
-    // Prepare ERD data
-    const erdData = {
-        name: erdName,
-        entities: entities.map(e => ({
-            name: e.name,
-            attributes: e.attributes
-        })),
-        relationships: relationships.map(r => ({
-            entity1: r.entity1,
-            entity2: r.entity2,
-            type: r.type
-        })),
-        advisor_id: getUser().user_id // Add advisor_id for tracking
-    };
-    
-    try {
-        // If there's a current request, use the original flow
-        if (currentRequest) {
-            return originalSubmitERD();
-        }
-        
-        // Direct ERD creation (no request)
-        const erdResponse = await apiCall('/api/add-erd', 'POST', erdData);
-        const erdResult = await erdResponse.json();
-        
-        if (!erdResponse.ok) {
-            alert(`Gagal menyimpan ERD: ${erdResult.error}`);
-            return;
-        }
-        
-        alert('ERD berhasil dibuat!');
-        
-        // Close modal
-        document.getElementById('erdCreationModal').style.display = 'none';
-        
-        // Reload ERD list
-        loadMyERDs();
-        
-    } catch (error) {
-        alert(`Gagal membuat ERD: ${error.message}`);
-        console.error('Error:', error);
+// ==========================================
+// MODERN POPUP SYSTEM
+// ==========================================
+
+// SUCCESS POPUP (Hijau)
+function showSuccessPopup(title, message) {
+    document.getElementById('successPopupTitle').textContent = title;
+    document.getElementById('successPopupMessage').textContent = message;
+    document.getElementById('successPopup').classList.remove('hidden');
+}
+
+function closeSuccessPopup() {
+    document.getElementById('successPopup').classList.add('hidden');
+}
+
+// WARNING POPUP (Orange) - dengan callback
+let warningCallback = null;
+
+function showWarningPopup(title, message, callback) {
+    document.getElementById('warningPopupTitle').textContent = title;
+    document.getElementById('warningPopupMessage').textContent = message;
+    document.getElementById('warningPopup').classList.remove('hidden');
+    warningCallback = callback;
+}
+
+function closeWarningPopup(confirmed) {
+    document.getElementById('warningPopup').classList.add('hidden');
+    if (warningCallback) {
+        warningCallback(confirmed);
+        warningCallback = null;
     }
 }
+
+// ERROR POPUP (Merah)
+function showErrorPopup(title, message) {
+    document.getElementById('errorPopupTitle').textContent = title;
+    document.getElementById('errorPopupMessage').textContent = message;
+    document.getElementById('errorPopup').classList.remove('hidden');
+}
+
+function closeErrorPopup() {
+    document.getElementById('errorPopup').classList.add('hidden');
+}
+
+// Close popup on overlay click
+document.addEventListener('DOMContentLoaded', function() {
+    // Success popup
+    const successPopup = document.getElementById('successPopup');
+    if (successPopup) {
+        successPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeSuccessPopup();
+        });
+    }
+    
+    // Warning popup
+    const warningPopup = document.getElementById('warningPopup');
+    if (warningPopup) {
+        warningPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeWarningPopup(false);
+        });
+    }
+    
+    // Error popup
+    const errorPopup = document.getElementById('errorPopup');
+    if (errorPopup) {
+        errorPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeErrorPopup();
+        });
+    }
+});
+
+// Close popup on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('successPopup').classList.contains('hidden')) {
+            closeSuccessPopup();
+        }
+        if (!document.getElementById('warningPopup').classList.contains('hidden')) {
+            closeWarningPopup(false);
+        }
+        if (!document.getElementById('errorPopup').classList.contains('hidden')) {
+            closeErrorPopup();
+        }
+    }
+});

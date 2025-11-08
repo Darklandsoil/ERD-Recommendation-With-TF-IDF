@@ -31,6 +31,7 @@ class AdminController:
                 advisor = UserModel.from_dict(advisor_data)
                 advisor_list.append({
                     "user_id": advisor.user_id,
+                    "fullname": advisor.fullname,
                     "username": advisor.username,
                     "email": advisor.email,
                     "created_at": advisor.created_at.strftime("%Y-%m-%d %H:%M") if advisor.created_at else "",
@@ -55,11 +56,12 @@ class AdminController:
             data = request.json
             
             # Validate input data
-            if not data.get('username') or not data.get('email') or not data.get('password'):
-                return jsonify({"error": "Username, email, dan password diperlukan"}), 400
+            if not data.get('fullname') or not data.get('username') or not data.get('email') or not data.get('password'):
+                return jsonify({"error": "Fullname, Username, email, dan password diperlukan"}), 400
             
             # Create advisor user model
             advisor = UserModel(
+                fullname=data.get('fullname'),
                 username=data.get('username'),
                 email=data.get('email'),
                 password=data.get('password'),
@@ -84,6 +86,7 @@ class AdminController:
                 "message": "Advisor berhasil dibuat",
                 "advisor": {
                     "user_id": advisor.user_id,
+                    "fullname":advisor.fullname,
                     "username": advisor.username,
                     "email": advisor.email,
                     "role": advisor.role
@@ -120,6 +123,9 @@ class AdminController:
             # Prepare update data
             update_data = {}
             
+            if data.get('fullname'):
+                update_data['fullname'] = data.get('fullname')
+                
             if data.get('username'):
                 # Check if username already exists (except current user)
                 existing_user = db.find_user_by_username(data.get('username'))

@@ -8,7 +8,7 @@ class Database:
     def __init__(self):
         self.client = MongoClient(Config.MONGODB_URI)
         self.db = self.client[Config.DATABASE_NAME]
-        self.erd_collection = self.db[Config.COLLECTION_NAME]
+        self.erd_collection = self.db[Config.ERD_COLLECTION]
         self.users_collection = self.db[Config.USERS_COLLECTION]
         self.requests_collection = self.db[Config.REQUESTS_COLLECTION]
     
@@ -58,6 +58,10 @@ class Database:
         if self.users_collection.find_one({"$or": [{"username": user_data["username"]}, {"email": user_data["email"]}]}):
             return None
         return self.users_collection.insert_one(user_data)
+    
+    def find_user_by_fullname(self, fullname):
+        """Find user by fullname"""
+        return self.users_collection.find_one({"fullname": fullname})
     
     def find_user_by_username(self, username):
         """Find user by username"""
@@ -185,6 +189,7 @@ class Database:
             activity = self.get_advisor_activity(advisor['user_id'])
             activities.append({
                 "advisor_id": advisor['user_id'],
+                "fullname": advisor['fullname'],
                 "username": advisor['username'],
                 "email": advisor['email'],
                 "total_erds": activity['total_erds'],

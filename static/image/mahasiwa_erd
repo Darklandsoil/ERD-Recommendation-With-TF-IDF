@@ -1,0 +1,18 @@
+digraph {
+	graph [epsilon=0.0001 mode=major overlap=scale sep="+0.5" splines=line]
+	node [fontname=Arial fontsize=10]
+	edge [fontname="Arial Bold" fontsize=9]
+	bgcolor=white dpi=300
+	mahasiswa [label=mahasiswa fillcolor="#2C3E50" fontcolor=white fontname="Arial Bold" fontsize=11 height=0.7 pos="0,0!" shape=box style=filled width=1.8]
+	mahasiswa_nim [label=nim fillcolor="#F39C12" fontcolor="#2C3E50" fontname="Arial Bold" fontsize=9 height=0.5 pos="1.532088886237956,1.2855752193730785!" shape=ellipse style=filled width=1.2]
+	mahasiswa_nim -> mahasiswa [arrowhead=none penwidth=0.5]
+	mahasiswa_nama [label=nama fillcolor="#27AE60" fontcolor=white fontname=Arial fontsize=9 height=0.5 pos="-0.786646329649038,2.1612930278075893!" shape=ellipse style=filled width=1.2]
+	mahasiswa_nama -> mahasiswa [arrowhead=none penwidth=0.5]
+	mahasiswa_jurusan [label=jurusan fillcolor="#27AE60" fontcolor=white fontname=Arial fontsize=9 height=0.5 pos="-2.6,3.1840816777831187e-16!" shape=ellipse style=filled width=1.2]
+	mahasiswa_jurusan -> mahasiswa [arrowhead=none penwidth=0.5]
+	mahasiswa_alamat [label=alamat fillcolor="#27AE60" fontcolor=white fontname=Arial fontsize=9 height=0.5 pos="-0.6840402866513371,-1.8793852415718169!" shape=ellipse style=filled width=1.2]
+	mahasiswa_alamat -> mahasiswa [arrowhead=none penwidth=0.5]
+	rel_1 [label=memiliki fillcolor="#F39C12" fontcolor=white fontname="Arial Bold" fontsize=10 height=0.8 pos="0.0,0.0!" shape=diamond style=filled width=1.4]
+	mahasiswa -> rel_1 [label=1 arrowhead=none fontcolor="#2C3E50" fontname="Arial Bold" fontsize=10 penwidth=1.5]
+	rel_1 -> mahasiswa [label=1 arrowhead=none fontcolor="#2C3E50" fontname="Arial Bold" fontsize=10 penwidth=1.5]
+}

@@ -76,8 +76,10 @@ class ERDGenerator:
             x_spacing, y_spacing = 25.0, 25.0  # VERY LARGE for 13+ entities
         elif num_entities > 8:
             x_spacing, y_spacing = 10.0, 10.0
-        else:
+        elif num_entities > 5:
             x_spacing, y_spacing = 7.0, 7.0
+        else:
+            x_spacing, y_spacing = 4.0, 4.0
         
         rel_graph = {}
         for rel in relationships:

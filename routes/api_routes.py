@@ -9,11 +9,15 @@ api_bp.add_url_rule('/list-erds', 'list_erds', ERDController.list_erds, methods=
 api_bp.add_url_rule('/reload-system', 'reload_system', ERDController.reload_system, methods=['POST'])
 
 # Advisor ERD routes
-api_bp.add_url_rule('/erds', 'add_erd', ERDController.add_erd, methods=['POST'])  # Create manual ERD
-api_bp.add_url_rule('/erds/my-erds', 'advisor_erds', ERDController.get_advisor_erds, methods=['GET'])  # Get advisor's ERDs
-api_bp.add_url_rule('/erds/<erd_id>', 'get_erd_detail', ERDController.get_erd_detail, methods=['GET'])  # Get ERD detail
-api_bp.add_url_rule('/erds/<erd_id>', 'update_erd', ERDController.update_erd, methods=['PUT'])  # Update ERD
-api_bp.add_url_rule('/erds/<erd_id>', 'delete_erd_by_id', ERDController.delete_erd_by_id, methods=['DELETE'])  # Delete ERD
+api_bp.add_url_rule('/add-erd', 'add_erd', ERDController.add_erd, methods=['POST'])  # Create ERD (legacy path)
+api_bp.add_url_rule('/advisor-erds', 'advisor_erds', ERDController.get_advisor_erds, methods=['GET'])  # Get advisor's ERDs (legacy path)
+api_bp.add_url_rule('/erd/<erd_id>', 'get_erd_detail', ERDController.get_erd_detail, methods=['GET'])  # Get ERD detail
+api_bp.add_url_rule('/erd/<erd_id>', 'update_erd', ERDController.update_erd, methods=['PUT'])  # Update ERD
+api_bp.add_url_rule('/erd/<erd_id>', 'delete_erd_by_id', ERDController.delete_erd_by_id, methods=['DELETE'])  # Delete ERD
+
+# Alternative modern paths
+api_bp.add_url_rule('/erds', 'create_erd', ERDController.add_erd, methods=['POST'])  # Create ERD
+api_bp.add_url_rule('/erds/my-erds', 'my_erds', ERDController.get_advisor_erds, methods=['GET'])  # Get advisor's ERDs
 
 # Legacy delete endpoint (by name)
 api_bp.add_url_rule('/delete-erd', 'delete_erd', ERDController.delete_erd, methods=['DELETE'])

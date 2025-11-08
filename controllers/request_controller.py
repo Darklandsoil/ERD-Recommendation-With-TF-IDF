@@ -234,7 +234,7 @@ class RequestController:
     @staticmethod
     @jwt_required()
     def complete_request(request_id):
-        """Complete request with ERD result"""
+        """Complete request with ERD ID"""
         try:
             advisor_id = get_jwt_identity()
             data = request.json
@@ -259,39 +259,23 @@ class RequestController:
             if req.status != 'on_process':
                 return jsonify({"error": "Request tidak dalam status on_process"}), 400
             
-            # Get ERD data from request
-            erd_data = data.get('erd_data')
-            notes_from_advisor = data.get('notes_from_advisor', '')
+            # Get ERD ID from request (ERD should be created beforehand)
+            erd_id = data.get('erd_id')
+            notes = data.get('notes', '')
             
+            if not erd_id:
+                return jsonify({"error": "ERD ID diperlukan"}), 400
+            
+            # Verify ERD exists and belongs to this advisor
+            erd_data = db.find_erd_by_id(erd_id)
             if not erd_data:
-                return jsonify({"error": "ERD data diperlukan"}), 400
+                return jsonify({"error": "ERD tidak ditemukan"}), 404
             
-            # Import ERDModel
-            from models.erd_model import ERDModel
-            from services.recommendation_service import recommendation_service
-            
-            # Create ERD in ERD collection with mode "from_request"
-            erd_model = ERDModel(
-                name=erd_data.get('name'),
-                entities=erd_data.get('entities'),
-                relationships=erd_data.get('relationships'),
-                advisor_id=advisor_id,
-                mode="from_request",
-                request_id=request_id
-            )
-            
-            # Validate ERD
-            is_valid, message = erd_model.validate()
-            if not is_valid:
-                return jsonify({"error": f"ERD tidak valid: {message}"}), 400
-            
-            # Save ERD to database
-            erd_result = db.save_erd(erd_model.to_dict())
-            if not erd_result:
-                return jsonify({"error": "Gagal menyimpan ERD"}), 500
+            if erd_data.get('advisor_id') != advisor_id:
+                return jsonify({"error": "ERD tidak dimiliki oleh advisor ini"}), 403
             
             # Complete request with erd_id reference
-            req.complete_request(erd_model.erd_id, notes_from_advisor)
+            req.complete_request(erd_id, notes)
             
             # Update request in database
             db.update_request(request_id, {
@@ -302,12 +286,9 @@ class RequestController:
                 "updated_at": req.updated_at
             })
             
-            # Reload recommendation system
-            recommendation_service.reload_system()
-            
             return jsonify({
                 "message": "Request berhasil diselesaikan",
-                "erd_id": erd_model.erd_id
+                "erd_id": erd_id
             }), 200
             
         except Exception as e:
