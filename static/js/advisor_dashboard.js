@@ -1009,56 +1009,96 @@ async function editERD(erdId) {
         editingErdId = erdId;
         currentRequest = null; // Clear request context for manual edit
         
-        // Reset form
-        resetERDForm();
+        // ✅ PERBAIKAN 1: Reset TOTAL sebelum load data
+        // Pastikan semua state benar-benar bersih
+        entities = [];
+        relationships = [];
+        entityCounter = 0;
+        relationshipCounter = 0;
         
-        // Populate form with ERD data
+        // Clear DOM containers
+        document.getElementById('entitiesContainer').innerHTML = '';
+        document.getElementById('relationshipsContainer').innerHTML = '';
+        
+        // Reset form inputs
+        document.getElementById('erdName').value = '';
+        document.getElementById('erdNotes').value = '';
+        
+        // ✅ PERBAIKAN 2: Populate form dengan data FRESH
         document.getElementById('erdName').value = erd.name;
         document.getElementById('erdNotes').value = '';
         
         // Change modal title
         document.getElementById('erdCreationTitle').textContent = 'Edit ERD';
         
-        // Populate entities
+        // ✅ PERBAIKAN 3: Populate entities dengan tracking yang benar
         erd.entities.forEach((entity, index) => {
-            addEntity();
-            const entityDiv = document.querySelector(`[data-entity-id="entity_${entityCounter}"]`);
-            entityDiv.querySelector('.entity-name').value = entity.name;
-            entityDiv.querySelector('.entity-pk').value = entity.primary_key || '';
+            addEntity(); // Ini akan increment entityCounter
             
-            // Update entity in array
-            entities[entities.length - 1].name = entity.name;
-            entities[entities.length - 1].attributes = entity.attributes || [];
-            entities[entities.length - 1].primary_key = entity.primary_key || '';
+            const currentEntityId = `entity_${entityCounter}`;
+            const entityDiv = document.querySelector(`[data-entity-id="${currentEntityId}"]`);
             
-            // Add attributes
-            (entity.attributes || []).forEach(attr => {
-                const input = entityDiv.querySelector('.new-attribute');
-                input.value = attr;
-                addAttribute(`entity_${entityCounter}`);
-            });
+            if (entityDiv) {
+                entityDiv.querySelector('.entity-name').value = entity.name;
+                entityDiv.querySelector('.entity-pk').value = entity.primary_key || '';
+                
+                // Update entity in array (gunakan index terakhir yang baru ditambahkan)
+                const lastEntityIndex = entities.length - 1;
+                entities[lastEntityIndex].name = entity.name;
+                entities[lastEntityIndex].attributes = []; // Reset dulu
+                entities[lastEntityIndex].primary_key = entity.primary_key || '';
+                
+                // ✅ PERBAIKAN 4: Add attributes dengan memastikan tidak ada duplikasi
+                (entity.attributes || []).forEach(attr => {
+                    // Cek apakah attribute sudah ada (extra safety)
+                    if (!entities[lastEntityIndex].attributes.includes(attr)) {
+                        const input = entityDiv.querySelector('.new-attribute');
+                        input.value = attr;
+                        addAttribute(currentEntityId);
+                    }
+                });
+            }
         });
         
-        // Update relationship options first
+        // ✅ PERBAIKAN 5: Update relationship options SETELAH semua entities ready
         updateRelationshipOptions();
         
-        // Populate relationships
+        // Wait a bit to ensure DOM is fully updated
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // ✅ PERBAIKAN 6: Populate relationships
         erd.relationships.forEach(rel => {
-            addRelationship();
-            const relDiv = document.querySelector(`[data-relationship-id="relationship_${relationshipCounter}"]`);
-            relDiv.querySelector('.relationship-entity1').value = rel.entity1;
-            relDiv.querySelector('.relationship-entity2').value = rel.entity2;
-            relDiv.querySelector('.relationship-name').value = rel.relation;
-            relDiv.querySelector('.relationship-type').value = rel.type;
-            relDiv.querySelector('.relationship-layout').value = rel.layout;
+            addRelationship(); // Ini akan increment relationshipCounter
+            
+            const currentRelId = `relationship_${relationshipCounter}`;
+            const relDiv = document.querySelector(`[data-relationship-id="${currentRelId}"]`);
+            
+            if (relDiv) {
+                relDiv.querySelector('.relationship-entity1').value = rel.entity1;
+                relDiv.querySelector('.relationship-entity2').value = rel.entity2;
+                relDiv.querySelector('.relationship-name').value = rel.relation;
+                relDiv.querySelector('.relationship-type').value = rel.type;
+                relDiv.querySelector('.relationship-layout').value = rel.layout;
+            }
         });
         
         // Change submit button text
         const submitBtn = document.querySelector('#erdForm button[type="submit"]');
-        submitBtn.textContent = '💾 Update ERD';
+        if (submitBtn) {
+            submitBtn.textContent = '💾 Update ERD';
+        }
         
         // Show modal
         document.getElementById('erdCreationModal').style.display = 'block';
+        
+        // ✅ PERBAIKAN 7: Log untuk debugging
+        console.log('Edit ERD loaded:', {
+            erdId: erdId,
+            entitiesCount: entities.length,
+            relationshipsCount: relationships.length,
+            entityCounter: entityCounter,
+            relationshipCounter: relationshipCounter
+        });
         
     } catch (error) {
         showErrorPopup('Gagal memuat ERD untuk diedit');

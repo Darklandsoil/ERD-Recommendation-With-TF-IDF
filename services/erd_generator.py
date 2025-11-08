@@ -315,6 +315,9 @@ class ERDGenerator:
         num_entities = len(erd_data['entities'])
         
         dot = graphviz.Digraph(engine='neato', format='png')
+        dot.clear()
+        
+        
         dot.attr(bgcolor='white', dpi='300')
         
         # ADAPTIVE SETTINGS berdasarkan ukuran diagram
@@ -379,6 +382,8 @@ class ERDGenerator:
                 )
                 all_attr_positions.update(attr_positions)
         
+        added_edges = set()
+        
         # Render attributes
         for entity in erd_data['entities']:
             for attr in entity['attributes']:
@@ -408,8 +413,12 @@ class ERDGenerator:
                             width='1.2', height='0.5',
                             pos=pos_str)
                     
-                    dot.edge(attr_node_id, entity['name'], 
-                            arrowhead='none', penwidth='0.5')
+                    # ⚠️ CRITICAL FIX: Only add edge if not already added
+                    edge_key = (attr_node_id, entity['name'])
+                    if edge_key not in added_edges:
+                        dot.edge(attr_node_id, entity['name'], 
+                                arrowhead='none', penwidth='0.5')
+                        added_edges.add(edge_key)
         
         # Add relationships
         for i, rel in enumerate(erd_data['relationships']):
@@ -431,14 +440,22 @@ class ERDGenerator:
                             pos=pos_str)
                     
                     card = ERDGenerator.convert_relationship_to_cardinality(rel['type'])
-                    dot.edge(rel['entity1'], rel_node_id, 
-                            label=card['entity1'], arrowhead='none', 
-                            fontsize='10', fontname='Arial Bold',
-                            fontcolor='#2C3E50', penwidth='1.5')
-                    dot.edge(rel_node_id, rel['entity2'], 
-                            label=card['entity2'], arrowhead='none',
-                            fontsize='10', fontname='Arial Bold',
-                            fontcolor='#2C3E50', penwidth='1.5')
+                    edge1_key = (rel['entity1'], rel_node_id)
+                    edge2_key = (rel_node_id, rel['entity2'])
+                    
+                    if edge1_key not in added_edges:
+                        dot.edge(rel['entity1'], rel_node_id, 
+                                label=card['entity1'], arrowhead='none', 
+                                fontsize='10', fontname='Arial Bold',
+                                fontcolor='#2C3E50', penwidth='1.5')
+                        added_edges.add(edge1_key)
+                    
+                    if edge2_key not in added_edges:
+                        dot.edge(rel_node_id, rel['entity2'], 
+                                label=card['entity2'], arrowhead='none',
+                                fontsize='10', fontname='Arial Bold',
+                                fontcolor='#2C3E50', penwidth='1.5')
+                        added_edges.add(edge2_key)
         
         return ERDGenerator._save_diagram(dot, erd_name)
     
@@ -624,12 +641,21 @@ class ERDGenerator:
     
     @staticmethod
     def _save_diagram(dot, erd_name):
-        """Save diagram to file"""
+        """Save diagram to file - FIXED: Remove old file first"""
         filename = normalize_erd_name(erd_name) + "_erd"
         filepath = os.path.join(Config.UPLOAD_FOLDER, filename)
         
         if not os.path.exists(Config.UPLOAD_FOLDER):
             os.makedirs(Config.UPLOAD_FOLDER)
+        
+        # ⚠️ CRITICAL FIX: Delete old PNG file if exists
+        png_path = f"{filepath}.png"
+        if os.path.exists(png_path):
+            try:
+                os.remove(png_path)
+                print(f"Removed old file: {png_path}")
+            except Exception as e:
+                print(f"Warning: Could not remove old file: {e}")
         
         dot.render(filepath, format='png', cleanup=True)
         print(f"Successfully generated: {filename}.png")
