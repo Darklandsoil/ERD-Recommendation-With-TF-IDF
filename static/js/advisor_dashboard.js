@@ -117,9 +117,9 @@ function renderPendingRequests(requests) {
     if (requests.length === 0) {
         listEl.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">📋</div>
-                <h3>Tidak ada request pending</h3>
-                <p>Semua request telah diambil atau belum ada request baru dari user</p>
+                <i class='bx bx-inbox'></i>
+                <h3>Tidak Ada Request Pending</h3>
+                <p>Belum ada request baru dari user saat ini</p>
             </div>
         `;
         return;
@@ -131,27 +131,45 @@ function renderPendingRequests(requests) {
         
         const createdDate = new Date(request.created_at).toLocaleDateString('id-ID');
         
+        // Get first letter for avatar
+        const avatarLetter = request.user.username.charAt(0).toUpperCase();
+        
         item.innerHTML = `
             <div class="request-header">
-                <div class="request-info">
-                    <div class="user-info">👤 ${request.user.username} (${request.user.email})</div>
-                    <div class="request-query">${request.query}</div>
-                    <div class="request-description">${request.description}</div>
-                </div>
-                <div class="request-actions">
-                    <button class="btn-action btn-view" onclick="viewRequestDetails('${request.request_id}', 'pending')">
-                        Detail
-                    </button>
-                    <button class="btn-action btn-assign" onclick="assignRequestFromList('${request.request_id}')">
-                        Ambil Request
-                    </button>
+                <div class="user-avatar">${avatarLetter}</div>
+                <div class="request-header-content">
+                    <div class="request-title-row">
+                        <h3 class="request-title">${request.query}</h3>
+                        <span class="status-badge pending">
+                            <span class="status-dot"></span>
+                            ${request.status_display}
+                        </span>
+                    </div>
+                    <div class="user-info">
+                        <i class='bx bx-user'></i>
+                        <span><strong>${request.user.username}</strong> (${request.user.email})</span>
+                    </div>
                 </div>
             </div>
-            <div class="request-meta">
-                <span>📅 Dibuat: ${createdDate}</span>
-                <div class="status-indicator pending">
-                    <span class="status-dot pending"></span>
-                    ${request.status_display}
+
+            <div class="request-body">
+                <p class="request-description">
+                    ${request.description}
+                </p>
+            </div>
+
+            <div class="request-footer">
+                <div class="request-meta">
+                    <div class="meta-item">
+                        <i class='bx bx-calendar'></i>
+                        <span>Dibuat: ${createdDate}</span>
+                    </div>
+                </div>
+                <div class="request-actions">
+                    <button class="btn btn-action" onclick="assignRequestFromList('${request.request_id}')">
+                        <i class='bx bx-bookmark'></i>
+                        Ambil Request
+                    </button>
                 </div>
             </div>
         `;
@@ -191,8 +209,8 @@ function renderAssignedRequests(requests) {
     if (requests.length === 0) {
         listEl.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">⚙️</div>
-                <h3>Tidak ada request yang dikerjakan</h3>
+                <i class='bx bx-time'></i>
+                <h3>Tidak Ada Request Dikerjakan</h3>
                 <p>Ambil request dari tab "Request Pending" untuk mulai bekerja</p>
             </div>
         `;
@@ -204,32 +222,50 @@ function renderAssignedRequests(requests) {
         item.className = 'request-item';
         
         const updatedDate = new Date(request.updated_at).toLocaleDateString('id-ID');
-        const statusClass = request.status.replace('_', '');
+        const statusClass = request.status === 'on_process' ? 'assigned' : 'completed';
+        
+        // Get first letter for avatar
+        const avatarLetter = request.user.username.charAt(0).toUpperCase();
         
         item.innerHTML = `
             <div class="request-header">
-                <div class="request-info">
-                    <div class="user-info">👤 ${request.user.username} (${request.user.email})</div>
-                    <div class="request-query">${request.query}</div>
-                    <div class="request-description">${request.description}</div>
+                <div class="user-avatar">${avatarLetter}</div>
+                <div class="request-header-content">
+                    <div class="request-title-row">
+                        <h3 class="request-title">${request.query}</h3>
+                        <span class="status-badge ${statusClass}">
+                            <span class="status-dot"></span>
+                            ${request.status_display}
+                        </span>
+                    </div>
+                    <div class="user-info">
+                        <i class='bx bx-user'></i>
+                        <span><strong>${request.user.username}</strong> (${request.user.email})</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="request-body">
+                <p class="request-description">
+                    ${request.description}
+                </p>
+            </div>
+
+            <div class="request-footer">
+                <div class="request-meta">
+                    <div class="meta-item">
+                        <i class='bx bx-calendar'></i>
+                        <span>Update: ${updatedDate}</span>
+                    </div>
                 </div>
                 <div class="request-actions">
-                    <button class="btn-action btn-view" onclick="viewRequestDetails('${request.request_id}', '${request.status}')">
-                        Detail
-                    </button>
                     ${request.status === 'on_process' ? 
-                        `<button class="btn-action btn-create-erd" onclick="startERDCreation('${request.request_id}')">
+                        `<button class="btn btn-action" onclick="startERDCreation('${request.request_id}')">
+                            <i class='bx bx-plus-circle'></i>
                             Buat ERD
                         </button>` : 
                         ''
                     }
-                </div>
-            </div>
-            <div class="request-meta">
-                <span>📅 Update: ${updatedDate}</span>
-                <div class="status-indicator ${statusClass}">
-                    <span class="status-dot ${statusClass}"></span>
-                    ${request.status_display}
                 </div>
             </div>
         `;
@@ -911,13 +947,13 @@ function renderMyERDs(erds) {
             </div>
             <div class="erd-card-actions">
                 <button class="btn-view-erd" onclick="viewERDImage('${erd.name}')">
-                    👁️ Lihat
+                    <i class='bx bxs-show'></i> Lihat
                 </button>
                 <button class="btn-edit-erd" onclick="editERD('${erd.erd_id}')">
-                    ✏️ Edit
+                    <i class='bx bxs-edit'></i> Edit
                 </button>
                 <button class="btn-delete-erd" onclick="deleteERDById('${erd.erd_id}', '${erd.display_name}')">
-                    🗑️ Hapus
+                    <i class='bx bxs-trash'></i> Hapus
                 </button>
             </div>
         `;

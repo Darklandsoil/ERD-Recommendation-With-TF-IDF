@@ -61,6 +61,8 @@ async function loadStatistics() {
 
 function renderStatistics(stats) {
     const cardsEl = document.getElementById('statisticsCards');
+
+    cardsEl.innerHTML = '';
     
     const statsData = [
         {
@@ -328,17 +330,17 @@ document.getElementById('addAdvisorForm').addEventListener('submit', async funct
         const data = await response.json();
         
         if (!response.ok) {
-            alert(data.error || 'Gagal menambah pakar');
+            showErrorPopup(data.error || 'Gagal menambah pakar');
             return;
         }
         
-        alert('Pakar berhasil ditambahkan!');
+        showSuccessPopup('Pakar berhasil ditambahkan!');
         closeAddAdvisorModal();
         loadAdvisors();
         
     } catch (error) {
         console.error('Error adding advisor:', error);
-        alert('Terjadi kesalahan saat menambah pakar');
+        showErrorPopup('Terjadi kesalahan saat menambah pakar');
     }
 });
 
@@ -390,51 +392,53 @@ document.getElementById('editAdvisorForm').addEventListener('submit', async func
         const data = await response.json();
         
         if (!response.ok) {
-            alert(data.error || 'Gagal mengupdate pakar');
+            showErrorPopup(data.error || 'Gagal mengupdate pakar');
             return;
         }
         
-        alert('Pakar berhasil diupdate!');
+        showSuccessPopup('Pakar berhasil diupdate!');
         closeEditAdvisorModal();
         loadAdvisors();
         
     } catch (error) {
         console.error('Error updating advisor:', error);
-        alert('Terjadi kesalahan saat mengupdate pakar');
+        showErrorPopup('Terjadi kesalahan saat mengupdate pakar');
     }
 });
 
 // Delete advisor
 async function deleteAdvisor(userId, username) {
-    if (!confirm(`Apakah Anda yakin ingin menghapus pakar "${username}"?`)) {
-        return;
-    }
-    
-    try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('/admin/api/advisors/delete', {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ user_id: userId })
-        });
-        
-        const data = await response.json();
-        
-        if (!response.ok) {
-            alert(data.error || 'Gagal menghapus pakar');
-            return;
+    showWarningPopup(
+        'Konfirmasi Hapus',
+        `Apakah Anda yakin ingin menghapus pakar "${username}"? Tindakan ini tidak dapat dibatalkan.`,
+        async (confirmed) => {
+            if (!confirmed) return;
+            
+            try {
+                const token = localStorage.getItem('token'); 
+                const response = await fetch(`/admin/api/advisors/delete`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ user_id: userId })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showSuccessPopup('Berhasil!', 'Pakar berhasil dihapus!');
+                    loadAdvisors();
+                } else {
+                    showErrorPopup('Gagal!', data.error || 'Gagal menghapus ERD');
+                }
+            } catch (error) {
+                showErrorPopup('Gagal!', 'Terjadi kesalahan saat menghapus pakar');
+                console.error('Error:', error);
+            }
         }
-        
-        alert('Pakar berhasil dihapus!');
-        loadAdvisors();
-        
-    } catch (error) {
-        console.error('Error deleting advisor:', error);
-        alert('Terjadi kesalahan saat menghapus pakar');
-    }
+    );
 }
 
 // Close modal when clicking outside
@@ -449,3 +453,89 @@ window.onclick = function(event) {
         closeEditAdvisorModal();
     }
 }
+
+// ==========================================
+// MODERN POPUP SYSTEM
+// ==========================================
+
+// SUCCESS POPUP (Hijau)
+function showSuccessPopup(title, message) {
+    document.getElementById('successPopupTitle').textContent = title;
+    document.getElementById('successPopupMessage').textContent = message;
+    document.getElementById('successPopup').classList.remove('hidden');
+}
+
+function closeSuccessPopup() {
+    document.getElementById('successPopup').classList.add('hidden');
+}
+
+// WARNING POPUP (Orange) - dengan callback
+let warningCallback = null;
+
+function showWarningPopup(title, message, callback) {
+    document.getElementById('warningPopupTitle').textContent = title;
+    document.getElementById('warningPopupMessage').textContent = message;
+    document.getElementById('warningPopup').classList.remove('hidden');
+    warningCallback = callback;
+}
+
+function closeWarningPopup(confirmed) {
+    document.getElementById('warningPopup').classList.add('hidden');
+    if (warningCallback) {
+        warningCallback(confirmed);
+        warningCallback = null;
+    }
+}
+
+// ERROR POPUP (Merah)
+function showErrorPopup(title, message) {
+    document.getElementById('errorPopupTitle').textContent = title;
+    document.getElementById('errorPopupMessage').textContent = message;
+    document.getElementById('errorPopup').classList.remove('hidden');
+}
+
+function closeErrorPopup() {
+    document.getElementById('errorPopup').classList.add('hidden');
+}
+
+// Close popup on overlay click
+document.addEventListener('DOMContentLoaded', function() {
+    // Success popup
+    const successPopup = document.getElementById('successPopup');
+    if (successPopup) {
+        successPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeSuccessPopup();
+        });
+    }
+    
+    // Warning popup
+    const warningPopup = document.getElementById('warningPopup');
+    if (warningPopup) {
+        warningPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeWarningPopup(false);
+        });
+    }
+    
+    // Error popup
+    const errorPopup = document.getElementById('errorPopup');
+    if (errorPopup) {
+        errorPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeErrorPopup();
+        });
+    }
+});
+
+// Close popup on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('successPopup').classList.contains('hidden')) {
+            closeSuccessPopup();
+        }
+        if (!document.getElementById('warningPopup').classList.contains('hidden')) {
+            closeWarningPopup(false);
+        }
+        if (!document.getElementById('errorPopup').classList.contains('hidden')) {
+            closeErrorPopup();
+        }
+    }
+});

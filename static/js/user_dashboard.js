@@ -379,7 +379,7 @@ async function handleAskAdvisor(event) {
     const description = document.getElementById('requestDescription').value.trim();
     
     if (!description) {
-        alert('Deskripsi harus diisi');
+        showErrorPopup('Deskripsi harus diisi');
         return;
     }
     
@@ -392,16 +392,16 @@ async function handleAskAdvisor(event) {
         const data = await response.json();
         
         if (response.ok) {
-            alert('Request berhasil dikirim ke advisor!');
+            showSuccessPopup('Request berhasil dikirim ke advisor!');
             closeAskAdvisorModal();
             
             // Switch to requests tab
             document.querySelector('[data-tab="requests"]').click();
         } else {
-            alert(data.error || 'Gagal mengirim request');
+            showErrorPopup(data.error || 'Gagal mengirim request');
         }
     } catch (error) {
-        alert('Gagal mengirim request. Periksa koneksi internet.');
+        showErrorPopup('Gagal mengirim request. Periksa koneksi internet.');
         console.error('Error:', error);
     }
 }
@@ -435,32 +435,54 @@ function renderRequestsList(requests) {
     const listEl = document.getElementById('requestsList');
     
     if (requests.length === 0) {
-        listEl.innerHTML = '<div class="empty-message">Belum ada request ERD</div>';
+        listEl.innerHTML = '<div class="empty-message">Belum ada request ERD yang diajukan</div>';
         return;
     }
     
-    requests.forEach(request => {
+    listEl.innerHTML = '';
+    
+    requests.forEach((request, index) => {
         const item = document.createElement('div');
         item.className = 'request-item';
         
-        const statusClass = request.status.replace('_', '');
-        const createdDate = new Date(request.created_at).toLocaleDateString('id-ID');
+        // Format status untuk class CSS
+        const statusClass = request.status.replace('_', '').toLowerCase();
+        
+        // Set data-status attribute untuk border color
+        item.setAttribute('data-status', statusClass);
+        
+        // Format tanggal
+        const createdDate = new Date(request.created_at).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+        
+        // Status display mapping (tanpa emoji, clean)
+        const statusDisplayMap = {
+            'pending': 'Menunggu',
+            'on_process': 'Sedang Dikerjakan',
+            'complete': 'Selesai',
+            'cancelled': 'Dibatalkan'
+        };
+        
+        const statusDisplay = statusDisplayMap[statusClass] || request.status_display;
         
         item.innerHTML = `
             <div class="item-header">
-                <div class="item-title">${request.query}</div>
-                <div class="status-badge ${statusClass}">${request.status_display}</div>
+                <div class="status-badge ${statusClass}">${statusDisplay}</div>
+                <div class="item-title">${escapeHtml(request.query)}</div>
             </div>
-            <div class="item-description">${request.description}</div>
+            <div class="item-description">${escapeHtml(request.description)}</div>
             <div class="item-meta">
-                <span>Dibuat: ${createdDate}</span>
+                <span>${createdDate}</span>
                 <div class="item-actions">
                     ${request.status === 'pending' ? 
                         `<button class="btn-small btn-cancel" onclick="cancelRequest('${request.request_id}')">Batalkan</button>` : 
                         ''
                     }
                     ${request.status === 'complete' && request.notes ? 
-                        `<button class="btn-small btn-primary" onclick="showRequestNotes('${request.notes}')">Lihat Catatan</button>` : 
+                        `<button class="btn-small btn-primary" onclick="showRequestNotes(\`${escapeHtml(request.notes)}\`)">Lihat Catatan</button>` : 
                         ''
                     }
                 </div>
@@ -472,29 +494,49 @@ function renderRequestsList(requests) {
 }
 
 async function cancelRequest(requestId) {
-    if (!confirm('Yakin ingin membatalkan request ini?')) return;
-    
-    try {
-        const response = await apiCall(`/api/requests/${requestId}/cancel`, {
-            method: 'PUT'
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            alert('Request berhasil dibatalkan');
-            loadUserRequests();
-        } else {
-            alert(data.error || 'Gagal membatalkan request');
+    showWarningPopup(
+        'Konfirmasi Hapus',
+        'Apakah Anda yakin ingin membatalkan request ? Tindakan ini tidak dibatalkan.',
+
+        async (confirmed) => {
+            if(!confirmed) return;
+
+            try {
+                const token = localStorage.getItem('token');
+                const response = await apiCall('/api/requests/${requestId}/cancel', {
+                    method: 'PUT'
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showSuccessPopup('Berhasil !','Request Berhasil Dibatalkan !');
+                    loadUserRequests();
+                } else {
+                    showErrorPopup('Gagal', 'Gagal Membatalkan Request');
+                }
+            } catch (error) {
+                showErrorPopup('Gagal Membatalkan Request');
+                console.error('Error', error );
+            }
         }
-    } catch (error) {
-        alert('Gagal membatalkan request');
-        console.error('Error:', error);
-    }
+    )
+}
+
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+        '`': '&#x60;'
+    };
+    return text.replace(/[&<>"'`]/g, m => map[m]);
 }
 
 function showRequestNotes(notes) {
-    alert(`Catatan dari Advisor:\n\n${notes}`);
+    showSuccessPopup(`Catatan dari Advisor:\n\n${notes}`);
 }
 
 // Load user history
@@ -528,36 +570,38 @@ function renderHistoryList(history) {
     const listEl = document.getElementById('historyList');
     
     if (history.length === 0) {
-        listEl.innerHTML = '<div class="empty-message">Belum ada riwayat ERD</div>';
+        listEl.innerHTML = '<div class="empty-message">Belum ada riwayat ERD yang selesai</div>';
         return;
     }
     
-    history.forEach(item => {
+    listEl.innerHTML = '';
+    
+    history.forEach((item, index) => {
         const historyItem = document.createElement('div');
         historyItem.className = 'history-item';
         
-        const completedDate = new Date(item.completed_at).toLocaleDateString('id-ID');
+        const completedDate = new Date(item.completed_at).toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
         
         historyItem.innerHTML = `
             <div class="item-header">
-                <div class="item-title">${item.query}</div>
-                <div class="status-badge complete">${item.status_display}</div>
+                <div class="item-title">${escapeHtml(item.query)}</div>
+                <div class="status-badge complete">✅ Selesai</div>
             </div>
-            <div class="item-description">${item.description}</div>
+            <div class="item-description">${escapeHtml(item.description)}</div>
             <div class="item-meta">
-                <span>Selesai: ${completedDate}</span>
-                ${item.notes ? `<span>📝 Ada catatan advisor</span>` : ''}
+                <span>${completedDate}</span>
+                ${item.notes ? `<button class="btn-small btn-primary" onclick="showRequestNotes(\`${escapeHtml(item.notes)}\`)">Lihat Catatan</button>` : ''}
             </div>
         `;
-        
-        if (item.notes) {
-            historyItem.addEventListener('click', () => showRequestNotes(item.notes));
-            historyItem.style.cursor = 'pointer';
-        }
         
         listEl.appendChild(historyItem);
     });
 }
+
 
 // Utility functions
 function showStatus(elementId, message, type) {
@@ -571,3 +615,89 @@ function hideStatus(elementId) {
     const statusElement = document.getElementById(elementId);
     statusElement.style.display = 'none';
 }
+
+// ==========================================
+// MODERN POPUP SYSTEM
+// ==========================================
+
+// SUCCESS POPUP (Hijau)
+function showSuccessPopup(title, message) {
+    document.getElementById('successPopupTitle').textContent = title;
+    document.getElementById('successPopupMessage').textContent = message;
+    document.getElementById('successPopup').classList.remove('hidden');
+}
+
+function closeSuccessPopup() {
+    document.getElementById('successPopup').classList.add('hidden');
+}
+
+// WARNING POPUP (Orange) - dengan callback
+let warningCallback = null;
+
+function showWarningPopup(title, message, callback) {
+    document.getElementById('warningPopupTitle').textContent = title;
+    document.getElementById('warningPopupMessage').textContent = message;
+    document.getElementById('warningPopup').classList.remove('hidden');
+    warningCallback = callback;
+}
+
+function closeWarningPopup(confirmed) {
+    document.getElementById('warningPopup').classList.add('hidden');
+    if (warningCallback) {
+        warningCallback(confirmed);
+        warningCallback = null;
+    }
+}
+
+// ERROR POPUP (Merah)
+function showErrorPopup(title, message) {
+    document.getElementById('errorPopupTitle').textContent = title;
+    document.getElementById('errorPopupMessage').textContent = message;
+    document.getElementById('errorPopup').classList.remove('hidden');
+}
+
+function closeErrorPopup() {
+    document.getElementById('errorPopup').classList.add('hidden');
+}
+
+// Close popup on overlay click
+document.addEventListener('DOMContentLoaded', function() {
+    // Success popup
+    const successPopup = document.getElementById('successPopup');
+    if (successPopup) {
+        successPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeSuccessPopup();
+        });
+    }
+    
+    // Warning popup
+    const warningPopup = document.getElementById('warningPopup');
+    if (warningPopup) {
+        warningPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeWarningPopup(false);
+        });
+    }
+    
+    // Error popup
+    const errorPopup = document.getElementById('errorPopup');
+    if (errorPopup) {
+        errorPopup.addEventListener('click', function(e) {
+            if (e.target === this) closeErrorPopup();
+        });
+    }
+});
+
+// Close popup on ESC key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        if (!document.getElementById('successPopup').classList.contains('hidden')) {
+            closeSuccessPopup();
+        }
+        if (!document.getElementById('warningPopup').classList.contains('hidden')) {
+            closeWarningPopup(false);
+        }
+        if (!document.getElementById('errorPopup').classList.contains('hidden')) {
+            closeErrorPopup();
+        }
+    }
+});
