@@ -9,90 +9,93 @@
 </head>
 <body>
     
-    <!-- Navigation -->
-    <nav class="navbar">    
-        <div class="nav-container">
-            <div class="nav-brand">
-                <h2>🎯 ERD Generator</h2>
-            </div>
-            <div class="nav-menu">
-                <span id="userWelcome">Loading...</span>
-                <button onclick="logout()" class="logout-btn">Logout</button>
-            </div>
-        </div>
-    </nav>
-
     <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <!-- Toggle Button -->
-            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
-                <i class='bx bx-chevron-left'></i>
-            </button>
+        <!-- Top Navbar -->
+        <nav class="top-navbar">
+            <div class="navbar-content">
+                <!-- Logo -->
+                <div class="navbar-logo">
+                    <div class="logo-icon">
+                        <i class='bx bx-data'></i>
+                    </div>
+                    <span class="logo-text">ERD Generator</span>
+                </div>
 
-            <div class="sidebar-menu">
-                <a href="#search" class="menu-item active" data-tab="search" onclick="switchTab('search')">
-                    <span>🔍</span>
-                    <span>Cari ERD</span>
-                </a>
-                <a href="#requests" class="menu-item" data-tab="requests" onclick="switchTab('requests')">
-                    <span>📋</span>
-                    <span>Request Saya</span>
-                </a>
-                <a href="#history" class="menu-item" data-tab="history" onclick="switchTab('history')">
-                    <span>📚</span>
-                    <span>Riwayat</span>
-                </a>
+                <!-- Navigation Links -->
+                <div class="nav-links">
+                    <a href="#home" class="nav-link active" data-tab="home" onclick="switchTab('home')">Home</a>
+                    <a href="#requests" class="nav-link" data-tab="requests" onclick="switchTab('requests')">Request</a>
+                </div>
+
+                <!-- User Account -->
+                <div class="user-account">
+                    <button class="account-btn" onclick="toggleUserMenu()">
+                        <i class='bx bx-user-circle'></i>
+                    </button>
+                    
+                    <!-- User Dropdown Menu -->
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-menu-header">
+                            <div class="user-avatar">
+                                <i class='bx bx-user'></i>
+                            </div>
+                            <div class="user-info">
+                                <div class="user-name" id="userName">User Name</div>
+                                <div class="user-status">User</div>
+                            </div>
+                            <div class="user-status-indicator"></div>
+                        </div>
+                        
+                        <div class="user-menu-divider"></div>
+                        
+                        <button class="user-menu-item logout-item" onclick="logout()">
+                            <i class='bx bx-log-out'></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </aside>
+        </nav>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Search Tab -->
-            <div id="search-tab" class="tab-content active">
-                <div class="content-header">
-                    <h2>Pencarian ERD</h2>
-                    <p>Cari ERD yang sesuai dengan kebutuhan Anda</p>
+            <!-- Home Tab -->
+            <div id="home-tab" class="tab-content active">
+                <!-- Hero Section -->
+                <div class="hero-section">
+                    <h1 class="hero-title" id="userWelcome">Find an ERD</h1>
+                    <p class="hero-subtitle">Temukan dan eksplorasi diagram ERD yang sesuai dengan kebutuhan proyek Anda.</p>
+                    
+                    <!-- Search Bar -->
+                    <div class="hero-search">
+                        <i class='bx bx-search'></i>
+                        <input type="text" id="userInput" placeholder="Cari berdasarkan nama ERD atau entitas...." />
+                    </div>
                 </div>
 
-                <div class="search-section">
-                    <form id="erdForm">
-                        <div class="input-group">
-                            <input
-                                type="text"
-                                id="userInput"
-                                placeholder="Contoh: perpustakaan, sistem akademik, penjualan, dll..."
-                                required
-                            />
-                            <button type="submit" id="searchBtn">
-                                <span id="searchBtnText">Cari ERD</span>
-                                <span id="searchSpinner" class="loading-spinner" style="display: none;"></span>
-                            </button>
-                        </div>
-                        
-                        <div class="search-options">
-                            <label>
-                                Top K:
-                                <input type="number" id="topK" min="1" max="20" value="10">
-                            </label>
-                            <label>
-                                Min Similarity:
-                                <input type="number" id="minSimilarity" min="0" max="1" step="0.01" value="0.05">
-                            </label>
-                        </div>
-                    </form>
+                <!-- Search Options (Hidden by default) -->
+                <div class="search-options-section" style="display: none;">
+                    <label>
+                        Top K:
+                        <input type="number" id="topK" min="1" max="20" value="10">
+                    </label>
+                    <label>
+                        Min Similarity:
+                        <input type="number" id="minSimilarity" min="0" max="1" step="0.01" value="0.05">
+                    </label>
                 </div>
 
+                <!-- Results Section -->
                 <div class="results-section" id="resultsSection">
-                    <!-- CONTAINER UNTUK EMPTY STATE (CENTERED) -->
+                    <!-- Empty State Container -->
                     <div id="emptyStateContainer" class="empty-state-container" style="display: none;">
                         <div id="searchStatus"></div>
                         <button id="askAdvisorBtn" class="ask-advisor-btn" style="display: none;">
                             💡 Minta Bantuan Advisor
                         </button>
                     </div>
-                        
-                        <!-- CONTAINER UNTUK HASIL PENCARIAN (NORMAL) -->
+                    
+                    <!-- Search Results -->
                     <div class="search-results" id="searchResults" style="display: none;">
                         <div class="results-header">
                             <h3 id="searchResultsTitle"></h3>
@@ -104,61 +107,33 @@
 
             <!-- Requests Tab -->
             <div id="requests-tab" class="tab-content">
-                <!-- Header with Title, Filters, and Button -->
                 <div class="requests-header">
                     <h2 class="requests-title">Request ERD Saya</h2>
                     
                     <div class="requests-controls">
-                        <!-- Filter Buttons -->
                         <div class="filter-group">
                             <button class="filter-btn active" data-filter="all" onclick="filterRequests('all')">
                                 Status: All
                                 <i class='bx bx-chevron-down'></i>
                             </button>
-                            <!-- Uncomment for more filters
-                            <button class="filter-btn" data-filter="pending" onclick="filterRequests('pending')">
-                                Pending
-                            </button>
-                            <button class="filter-btn" data-filter="in_progress" onclick="filterRequests('in_progress')">
-                                In Progress
-                            </button>
-                            <button class="filter-btn" data-filter="complete" onclick="filterRequests('complete')">
-                                Completed
-                            </button>
-                            -->
                         </div>
                         
-                        <!-- Request ERD Baru Button -->
-                        <button class="btn-request-new" onclick="openRequestModal()">
+                        <button id="requestBtn" class="btn-request-new">
                             <i class='bx bx-plus'></i>
                             Request ERD Baru
                         </button>
                     </div>
                 </div>
 
-                <!-- Requests List -->
                 <div class="requests-section">
                     <div id="requestsLoading" class="loading">Memuat request...</div>
                     <div id="requestsList" class="requests-list"></div>
                 </div>
             </div>
-
-            <!-- History Tab -->
-            <div id="history-tab" class="tab-content">
-                <div class="content-header">
-                    <h2>Riwayat ERD</h2>
-                    <p>ERD yang telah Anda akses dan request yang telah selesai</p>
-                </div>
-
-                <div class="history-section">
-                    <div id="historyLoading" class="loading">Memuat riwayat...</div>
-                    <div id="historyList" class="history-list"></div>
-                </div>
-            </div>
         </main>
     </div>
 
-    <!-- Modal for ERD Preview -->
+    <!-- Modals tetap sama seperti sebelumnya -->
     <div id="erdModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -180,7 +155,6 @@
         </div>
     </div>
 
-    <!-- Modal for Ask Advisor -->
     <div id="askAdvisorModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -191,14 +165,14 @@
                 <form id="askAdvisorForm">
                     <div class="form-group">
                         <label for="requestQuery">Query/Topik ERD:</label>
-                        <input type="text" id="requestQuery" readonly>
+                        <input type="text" id="requestQuery">
                     </div>
                     <div class="form-group">
                         <label for="requestDescription">Deskripsi Detail:</label>
                         <textarea 
                             id="requestDescription" 
                             rows="4" 
-                            placeholder="Jelaskan secara detail ERD yang Anda butuhkan, termasuk entitas, atribut, dan relasi yang diinginkan..."
+                            placeholder="Jelaskan secara detail ERD yang Anda butuhkan..."
                             required
                         ></textarea>
                     </div>
@@ -211,7 +185,7 @@
         </div>
     </div>
 
-     <!-- SUCCESS POPUP (Hijau) -->
+    <!-- Popups tetap sama -->
     <div class="popup-overlay hidden" id="successPopup">
         <div class="popup">
             <div class="popup-header success">
@@ -223,9 +197,7 @@
             </div>
             <div class="popup-body">
                 <h2 class="popup-title" id="successPopupTitle">Berhasil!</h2>
-                <p class="popup-message" id="successPopupMessage">
-                    Operasi berhasil dilakukan.
-                </p>
+                <p class="popup-message" id="successPopupMessage">Operasi berhasil dilakukan.</p>
                 <div class="popup-buttons single">
                     <button class="popup-btn popup-btn-success" onclick="closeSuccessPopup()">OK</button>
                 </div>
@@ -233,7 +205,6 @@
         </div>
     </div>
 
-    <!-- WARNING POPUP (Orange/Kuning) -->
     <div class="popup-overlay hidden" id="warningPopup">
         <div class="popup">
             <div class="popup-header warning">
@@ -246,9 +217,7 @@
             </div>
             <div class="popup-body">
                 <h2 class="popup-title" id="warningPopupTitle">Konfirmasi</h2>
-                <p class="popup-message" id="warningPopupMessage">
-                    Apakah Anda yakin?
-                </p>
+                <p class="popup-message" id="warningPopupMessage">Apakah Anda yakin?</p>
                 <div class="popup-buttons">
                     <button class="popup-btn popup-btn-secondary" onclick="closeWarningPopup(false)">Batal</button>
                     <button class="popup-btn popup-btn-warning" onclick="closeWarningPopup(true)">Ya, Lanjutkan</button>
@@ -257,7 +226,6 @@
         </div>
     </div>
 
-    <!-- ERROR POPUP (Merah) -->
     <div class="popup-overlay hidden" id="errorPopup">
         <div class="popup">
             <div class="popup-header error">
@@ -271,9 +239,7 @@
             </div>
             <div class="popup-body">
                 <h2 class="popup-title" id="errorPopupTitle">Gagal!</h2>
-                <p class="popup-message" id="errorPopupMessage">
-                    Terjadi kesalahan.
-                </p>
+                <p class="popup-message" id="errorPopupMessage">Terjadi kesalahan.</p>
                 <div class="popup-buttons single">
                     <button class="popup-btn popup-btn-error" onclick="closeErrorPopup()">OK</button>
                 </div>
@@ -281,22 +247,50 @@
         </div>
     </div>
 
-
     <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/user_dashboard.js') }}"></script>
     
     <script>
-        // Toggle Sidebar Function
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('collapsed');
-            
-            // Save state to localStorage
-            const isCollapsed = sidebar.classList.contains('collapsed');
-            localStorage.setItem('sidebarCollapsed', isCollapsed);
+        // Toggle User Menu
+        function toggleUserMenu() {
+            const menu = document.getElementById('userMenu');
+            menu.classList.toggle('active');
         }
-        // Initialize user dashboard
+
+        // Close menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const userAccount = document.querySelector('.user-account');
+            const userMenu = document.getElementById('userMenu');
+            
+            if (!userAccount.contains(event.target)) {
+                userMenu.classList.remove('active');
+            }
+        });
+
+        // Switch Tab Function
+        function switchTab(tabName) {
+            // Update nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load data based on tab
+            if (tabName === 'home') {
+                // Home tab logic
+            } else if (tabName === 'requests') {
+                loadUserRequests();
+            }
+        }
+
+        // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
             if (!requireAuth()) return;
             
@@ -306,13 +300,22 @@
                 return;
             }
 
-            // Restore sidebar state from localStorage
-            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
-            if (sidebarCollapsed) {
-                document.getElementById('sidebar').classList.add('collapsed');
-            }
+            // Set user name
+            document.getElementById('userName').textContent = user.username || user.email;
             
             initUserDashboard();
+            
+            // Handle search on Enter
+            document.getElementById('userInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const query = this.value.trim();
+                    if (query) {
+                        const topK = parseInt(document.getElementById('topK').value) || 10;
+                        const minSimilarity = parseFloat(document.getElementById('minSimilarity').value) || 0.05;
+                        searchERD(query, topK, minSimilarity);
+                    }
+                }
+            });
         });
     </script>
 </body>

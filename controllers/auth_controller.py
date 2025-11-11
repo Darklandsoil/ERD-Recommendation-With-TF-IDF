@@ -13,11 +13,12 @@ class AuthController:
             data = request.json
             
             # Validate input data
-            if not data.get('username') or not data.get('email') or not data.get('password'):
-                return jsonify({"error": "Username, email, dan password diperlukan"}), 400
+            if not data.get('fullname') or not data.get('username') or not data.get('email') or not data.get('password'):
+                return jsonify({"error": "Fullname, Username, email, dan password diperlukan"}), 400
             
             # Create user model with 'user' role only
             user = UserModel(
+                fullname= data.get('fullname'),
                 username=data.get('username'),
                 email=data.get('email'),
                 password=data.get('password'),
@@ -42,6 +43,7 @@ class AuthController:
                 "message": "Registrasi berhasil",
                 "user": {
                     "user_id": user.user_id,
+                    "fullname": user.fullname,
                     "username": user.username,
                     "email": user.email,
                     "role": user.role
@@ -90,6 +92,7 @@ class AuthController:
                 "access_token": access_token,
                 "user": {
                     "user_id": user.user_id,
+                    "fullname": user.fullname,
                     "username": user.username,
                     "email": user.email,
                     "role": user.role
@@ -114,6 +117,7 @@ class AuthController:
             return jsonify({
                 "user": {
                     "user_id": user.user_id,
+                    "fullname": user.fullname,
                     "username": user.username,
                     "email": user.email,
                     "role": user.role

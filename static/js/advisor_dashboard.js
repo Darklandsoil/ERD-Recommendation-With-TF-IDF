@@ -9,7 +9,7 @@ let relationshipCounter = 0;
 function initAdvisorDashboard() {
     // Display advisor welcome message
     const user = getUser();
-    document.getElementById('advisorWelcome').textContent = `Selamat datang, ${user.username}!`;
+    document.getElementById('advisorWelcome').textContent = `Selamat datang, ${user.fullname}!`;
     
     // Initialize tab navigation
     initAdvisorTabNavigation();

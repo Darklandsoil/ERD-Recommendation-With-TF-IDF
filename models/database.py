@@ -138,6 +138,10 @@ class Database:
         """Get all pending requests"""
         return list(self.requests_collection.find({"status": "pending"}).sort("created_at", 1))
     
+    def delete_request_by_id(self, request_id):
+        """Delete request by id"""
+        return self.requests_collection.delete_one({"request_id": request_id})
+    
     # Admin Statistics Methods
     def get_statistics(self):
         """Get system statistics for admin"""

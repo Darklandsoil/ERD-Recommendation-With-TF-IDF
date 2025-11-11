@@ -84,9 +84,29 @@ class ERDController:
     
     @staticmethod
     def list_erds():
-        """List all ERDs"""
+        """List ERDs """
         erds = db.get_erds_for_display()
         return jsonify({"erds": erds})
+    
+    @staticmethod
+    def show_all_erds():
+        """List all ERDs"""
+        erds = db.get_all_erds()
+        results = []
+        
+        for erd in erds:
+            results.append({
+                'erd_id': erd['erd_id'],
+                'name': erd['name'].replace('_', ' ').title(),
+                'entities': [entity['name'] for entity in erd['entities']],
+                'entity_count': len(erd['entities']),
+                'relationship_count': len(erd['relationships']),
+                'created_at': erd['created_at']
+            })
+        
+        return jsonify({
+            "results": results
+        })
     
     @staticmethod
     def generate_erd_image(erd_name):

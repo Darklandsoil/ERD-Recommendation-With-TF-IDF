@@ -35,7 +35,9 @@ function switchTab(tabName) {
     if (selectedMenuItem) selectedMenuItem.classList.add('active');
 
     // Load data based on tab
-    if (tabName === 'requests' && typeof loadUserRequests === 'function') {
+    if (tabName === 'dashboard' && typeof loadAllDiagrams === 'function') {
+        loadAllDiagrams();
+    } else if (tabName === 'requests' && typeof loadUserRequests === 'function') {
         loadUserRequests();
     } else if (tabName === 'history' && typeof loadUserHistory === 'function') {
         loadUserHistory();
@@ -227,7 +229,7 @@ function initDashboardHelpers() {
 
     // Set initial tab from URL hash
     const initialHash = window.location.hash.replace('#', '');
-    if (initialHash && ['search', 'requests', 'history'].includes(initialHash)) {
+    if (initialHash && ['dashboard', 'search', 'requests', 'history'].includes(initialHash)) {
         switchTab(initialHash);
     }
 

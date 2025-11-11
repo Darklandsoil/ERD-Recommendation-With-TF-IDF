@@ -6,6 +6,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 # ERD search and management routes
 api_bp.add_url_rule('/search-erd', 'search_erd', ERDController.search_erd, methods=['POST'])
 api_bp.add_url_rule('/list-erds', 'list_erds', ERDController.list_erds, methods=['GET'])
+api_bp.add_url_rule('/all-erds', 'all_erds', ERDController.show_all_erds, methods=['GET'])
 api_bp.add_url_rule('/reload-system', 'reload_system', ERDController.reload_system, methods=['POST'])
 
 # Advisor ERD routes

@@ -73,9 +73,31 @@ function setLoadingState(btnId, textId, spinnerId, isLoading) {
     }
 }
 
+// Toggle password visibility
+function initPasswordToggle(password, togglePassword) {
+    const passwordInput = document.getElementById(password);
+    const toggleBtn = document.getElementById(togglePassword);
+    
+    if (passwordInput && toggleBtn) {
+        toggleBtn.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Ganti ikon atau text button
+            if (type === 'password') {
+                toggleBtn.innerHTML = `<i class='bx bxs-show'></i>`; // atau icon lain
+            } else {
+                toggleBtn.innerHTML = `<i class='bx bxs-low-vision'></i>`; // atau icon lain
+            }
+        });
+    }
+}
+
 // Login form initialization
 function initLoginForm() {
     const form = document.getElementById('loginForm');
+
+    initPasswordToggle('password', 'togglePassword');
     
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -130,6 +152,9 @@ function initLoginForm() {
 // Register form initialization
 function initRegisterForm() {
     const form = document.getElementById('registerForm');
+
+    initPasswordToggle('password', 'togglePassword');
+    initPasswordToggle('cpassword', 'toggleCPassword');
     
     form.addEventListener('submit', async function(event) {
         event.preventDefault();
@@ -138,8 +163,9 @@ function initRegisterForm() {
         const username = document.getElementById('username').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
+        const cpassword = document.getElementById('cpassword').value;
         
-        if (!fullname || !username || !email || !password) {
+        if (!fullname || !username || !email || !password || !cpassword) {
             showStatus('registerStatus', 'Semua field harus diisi', 'error');
             return;
         }
@@ -152,6 +178,12 @@ function initRegisterForm() {
         if (password.length < 6) {
             showStatus('registerStatus', 'Password harus minimal 6 karakter', 'error');
             return;
+        }
+
+        //konfirmasi password
+        if (password !== cpassword) {
+            showStatus('registerStatus', 'Konfirmasi password tidak sesuai', 'error');
+            return
         }
         
         hideStatus('registerStatus');

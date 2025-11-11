@@ -97,12 +97,18 @@ class RequestController:
             if req.user_id != user_id:
                 return jsonify({"error": "Tidak memiliki akses ke request ini"}), 403
             
+            if req.status != 'pending':
+                return jsonify({"error": f"Request dengan status '{req.status}' tidak dapat dibatalkan"}), 400
             # Cancel request
-            if req.cancel_request():
-                db.update_request(request_id, {
-                    "status": req.status,
-                    "updated_at": req.updated_at
-                })
+            # if req.cancel_request():
+            #     db.update_request(request_id, {
+            #         "status": req.status,
+            #         "updated_at": req.updated_at
+            #     })
+            
+            # Delete Request
+            result = db.delete_request_by_id(request_id)
+            if result.deleted_count > 0:
                 return jsonify({"message": "Request berhasil dibatalkan"}), 200
             else:
                 return jsonify({"error": "Request tidak dapat dibatalkan"}), 400

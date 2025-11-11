@@ -3,12 +3,15 @@ let currentQuery = '';
 
 // Initialize user dashboard
 function initUserDashboard() {
-    // Display user welcome message
+
+    // Display User Welcome
     const user = getUser();
-    document.getElementById('userWelcome').textContent = `Selamat datang, ${user.username}!`;
+    const firstName = user.fullname.split(' ')[0];
+    document.getElementById('userWelcome').textContent = `Selamat datang, ${firstName}!`;
     
     // Initialize tab navigation
     initTabNavigation();
+    
     
     // Initialize search functionality
     initSearchFunctionality();
@@ -18,7 +21,6 @@ function initUserDashboard() {
     
     // Load initial data
     loadUserRequests();
-    loadUserHistory();
 }
 
 // Tab navigation
@@ -44,34 +46,44 @@ function initTabNavigation() {
             // Load data based on tab
             if (tabId === 'requests-tab') {
                 loadUserRequests();
-            } else if (tabId === 'history-tab') {
-                loadUserHistory();
             }
         });
     });
 }
 
-// Search functionality (enhanced from main.js)
+// Format date helper
+function formatDate(dateString) {
+    try {
+        const date = new Date(dateString);
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return date.toLocaleDateString('id-ID', options);
+    } catch (e) {
+        return dateString;
+    }
+}
+
+// Search functionality
 function initSearchFunctionality() {
-    const form = document.getElementById('erdForm');
+    const searchInput = document.getElementById('userInput');
     
-    form.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        
-        const query = document.getElementById('userInput').value.trim();
-        const topK = parseInt(document.getElementById('topK').value) || 10;
-        const minSimilarity = parseFloat(document.getElementById('minSimilarity').value) || 0.05;
-        
-        if (!query) return;
-        
-        currentQuery = query;
-        await searchERD(query, topK, minSimilarity);
+    // Handle Enter key
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = this.value.trim();
+            if (query) {
+                const topK = parseInt(document.getElementById('topK')?.value) || 10;
+                const minSimilarity = parseFloat(document.getElementById('minSimilarity')?.value) || 0.05;
+                searchERD(query, topK, minSimilarity);
+            }
+        }
     });
 }
 
 async function searchERD(query, topK, minSimilarity) {
+    // ✅ FIX: Update currentQuery
+    currentQuery = query;
+    
     clearResults();
-    setLoadingState('searchBtn', 'searchBtnText', 'searchSpinner', true);
     showStatus('searchStatus', 'Mencari ERD yang sesuai...', 'loading');
     
     try {
@@ -101,12 +113,10 @@ async function searchERD(query, topK, minSimilarity) {
     } catch (error) {
         showStatus('searchStatus', 'Gagal menghubungi server. Periksa koneksi internet Anda.', 'error');
         console.error('Error:', error);
-    } finally {
-        setLoadingState('searchBtn', 'searchBtnText', 'searchSpinner', false);
     }
 }
 
-// Fungsi untuk menampilkan hasil sukses
+// ✅ FIX: Hanya satu fungsi showSuccessResults
 function showSuccessResults(data) {
     // Sembunyikan empty state container
     const emptyStateContainer = document.getElementById('emptyStateContainer');
@@ -127,21 +137,8 @@ function showSuccessResults(data) {
     
     renderSearchResults(data.results);
     searchResults.style.display = 'block';
-    
-    // Sembunyikan status di dalam empty state jika ada
-    const statusInEmpty = document.querySelector('#emptyStateContainer #searchStatus');
-    if (statusInEmpty) {
-        statusInEmpty.style.display = 'none';
-    }
-    
-    // Sembunyikan tombol advisor di empty state
-    const advisorBtnInEmpty = document.querySelector('#emptyStateContainer #askAdvisorBtn');
-    if (advisorBtnInEmpty) {
-        advisorBtnInEmpty.style.display = 'none';
-    }
 }
 
-// Fungsi untuk menampilkan empty state yang centered
 function showEmptyState(query) {
     // Sembunyikan search results normal
     const searchResults = document.getElementById('searchResults');
@@ -158,70 +155,13 @@ function showEmptyState(query) {
     
     // Set pesan error
     statusDiv.className = 'error';
-    statusDiv.textContent = 'Tidak ditemukan ERD yang sesuai dengan query Anda.';
+    statusDiv.textContent = 'ERD Tidak Ditemukan.';
     statusDiv.style.display = 'block';
     
     // Tampilkan tombol ask advisor
-    advisorBtn.style.display = 'inline-flex';
-}
-
-// Fungsi untuk menampilkan hasil sukses
-function showSuccessResults(data) {
-    // Sembunyikan empty state container
-    const emptyStateContainer = document.getElementById('emptyStateContainer');
-    if (emptyStateContainer) {
-        emptyStateContainer.style.display = 'none';
+    if (advisorBtn) {
+        advisorBtn.style.display = 'inline-flex';
     }
-    
-    // Tampilkan hasil pencarian
-    const searchResults = document.getElementById('searchResults');
-    const searchResultsTitle = document.getElementById('searchResultsTitle');
-    
-    showStatus('searchStatus', 
-        `Ditemukan ${data.total_found} ERD yang sesuai dengan query: "${data.query}"`, 
-        'success'
-    );
-    
-    searchResultsTitle.textContent = `Hasil Pencarian (${data.total_found} ERD ditemukan):`;
-    
-    renderSearchResults(data.results);
-    searchResults.style.display = 'block';
-    
-    // Sembunyikan status di dalam empty state jika ada
-    const statusInEmpty = document.querySelector('#emptyStateContainer #searchStatus');
-    if (statusInEmpty) {
-        statusInEmpty.style.display = 'none';
-    }
-    
-    // Sembunyikan tombol advisor di empty state
-    const advisorBtnInEmpty = document.querySelector('#emptyStateContainer #askAdvisorBtn');
-    if (advisorBtnInEmpty) {
-        advisorBtnInEmpty.style.display = 'none';
-    }
-}
-
-// Fungsi untuk menampilkan empty state yang centered
-function showEmptyState(query) {
-    // Sembunyikan search results normal
-    const searchResults = document.getElementById('searchResults');
-    searchResults.style.display = 'none';
-    
-    // Tampilkan empty state container
-    const emptyStateContainer = document.getElementById('emptyStateContainer');
-    const statusDiv = document.getElementById('searchStatus');
-    const advisorBtn = document.getElementById('askAdvisorBtn');
-    
-    if (emptyStateContainer) {
-        emptyStateContainer.style.display = 'flex';
-    }
-    
-    // Set pesan error
-    statusDiv.className = 'error';
-    statusDiv.textContent = 'Tidak ditemukan ERD yang sesuai dengan query Anda.';
-    statusDiv.style.display = 'block';
-    
-    // Tampilkan tombol ask advisor
-    advisorBtn.style.display = 'inline-flex';
 }
     
 function clearResults() {
@@ -229,16 +169,23 @@ function clearResults() {
     const searchResults = document.getElementById('searchResults');
     const emptyStateContainer = document.getElementById('emptyStateContainer');
     
-    searchResults.style.display = 'none';
+    if (searchResults) {
+        searchResults.style.display = 'none';
+    }
     if (emptyStateContainer) {
         emptyStateContainer.style.display = 'none';
     }
     
-    document.getElementById('searchResultsGrid').innerHTML = '';
+    const resultsGrid = document.getElementById('searchResultsGrid');
+    if (resultsGrid) {
+        resultsGrid.innerHTML = '';
+    }
     
     // Sembunyikan status
     const statusDiv = document.getElementById('searchStatus');
-    statusDiv.style.display = 'none';
+    if (statusDiv) {
+        statusDiv.style.display = 'none';
+    }
     
     // Sembunyikan tombol advisor
     const advisorBtn = document.getElementById('askAdvisorBtn');
@@ -254,12 +201,11 @@ function renderSearchResults(results) {
     results.forEach(result => {
         const card = document.createElement('div');
         card.className = 'search-result-card';
+        
+        const erdName = result.name.toLowerCase().replace(/ /g, '_');
+        
         card.innerHTML = `
-            <div class="title" data-erd-name="${result.name.toLowerCase().replace(/ /g, '_')}">${result.name}</div>
-            <div class="similarity-badge">
-                Similarity: ${result.similarity}
-            </div>
-            <div class="entities">
+            <div class="title" data-erd-name="${erdName}">${result.name}</div>
                 <strong>Entitas:</strong> ${result.entities.join(', ')}
             </div>
             <div class="stats">
@@ -267,7 +213,6 @@ function renderSearchResults(results) {
             </div>
         `;
         
-        // Add click event to title
         const titleElement = card.querySelector('.title');
         titleElement.addEventListener('click', function() {
             const erdName = this.getAttribute('data-erd-name');
@@ -278,7 +223,7 @@ function renderSearchResults(results) {
     });
 }
 
-// ERD Preview (enhanced from main.js)
+// ERD Preview
 async function showERDPreview(erdName, displayName) {
     const modal = document.getElementById('erdModal');
     const modalTitle = document.getElementById('modalTitle');
@@ -328,16 +273,22 @@ async function showERDPreview(erdName, displayName) {
 // Initialize modals
 function initModals() {
     // ERD Modal
-    document.getElementById('closeModal').addEventListener('click', function() {
-        document.getElementById('erdModal').style.display = 'none';
-    });
+    const closeModalBtn = document.getElementById('closeModal');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', function() {
+            document.getElementById('erdModal').style.display = 'none';
+        });
+    }
     
-    document.getElementById('fullscreenBtn').addEventListener('click', function() {
-        const imageSrc = document.getElementById('modalImage').src;
-        if (imageSrc) {
-            window.open(imageSrc, '_blank');
-        }
-    });
+    const fullscreenBtn = document.getElementById('fullscreenBtn');
+    if (fullscreenBtn) {
+        fullscreenBtn.addEventListener('click', function() {
+            const imageSrc = document.getElementById('modalImage').src;
+            if (imageSrc) {
+                window.open(imageSrc, '_blank');
+            }
+        });
+    }
     
     // Ask Advisor Modal
     const askAdvisorBtn = document.getElementById('askAdvisorBtn');
@@ -347,11 +298,33 @@ function initModals() {
             document.getElementById('askAdvisorModal').style.display = 'block';
         });
     }
-    
-    document.getElementById('closeAskAdvisorModal').addEventListener('click', closeAskAdvisorModal);
+
+    const closeAskAdvisorBtn = document.getElementById('closeAskAdvisorModal');
+    if (closeAskAdvisorBtn) {
+        closeAskAdvisorBtn.addEventListener('click', closeAskAdvisorModal);
+    }
+
+    // Ask Advisor via Request Button
+    const requestBtn = document.getElementById('requestBtn')
+    if (requestBtn) {
+        requestBtn.addEventListener('click', function() {
+            document.getElementById('requestQuery');
+            document.getElementById('askAdvisorModal').style.display = 'block';
+        });
+    }
+
+    //close requestBtn
+    const closeRequestBtn = document.getElementById('closeAskAdvisorModal');
+    if (closeRequestBtn) {
+        closeRequestBtn.addEventListener('click', closeAskAdvisorModal);
+    }
+
     
     // Ask Advisor Form
-    document.getElementById('askAdvisorForm').addEventListener('submit', handleAskAdvisor);
+    const askAdvisorForm = document.getElementById('askAdvisorForm');
+    if (askAdvisorForm) {
+        askAdvisorForm.addEventListener('submit', handleAskAdvisor);
+    }
     
     // Close modals when clicking outside
     window.addEventListener('click', function(event) {
@@ -379,7 +352,7 @@ async function handleAskAdvisor(event) {
     const description = document.getElementById('requestDescription').value.trim();
     
     if (!description) {
-        showErrorPopup('Deskripsi harus diisi');
+        showErrorPopup('Gagal', 'Deskripsi harus diisi');
         return;
     }
     
@@ -392,16 +365,19 @@ async function handleAskAdvisor(event) {
         const data = await response.json();
         
         if (response.ok) {
-            showSuccessPopup('Request berhasil dikirim ke advisor!');
+            showSuccessPopup('Berhasil!', 'Request berhasil dikirim ke advisor!');
             closeAskAdvisorModal();
             
             // Switch to requests tab
-            document.querySelector('[data-tab="requests"]').click();
+            const requestsTab = document.querySelector('[data-tab="requests"]');
+            if (requestsTab) {
+                requestsTab.click();
+            }
         } else {
-            showErrorPopup(data.error || 'Gagal mengirim request');
+            showErrorPopup('Gagal', data.error || 'Gagal mengirim request');
         }
     } catch (error) {
-        showErrorPopup('Gagal mengirim request. Periksa koneksi internet.');
+        showErrorPopup('Gagal', 'Gagal mengirim request. Periksa koneksi internet.');
         console.error('Error:', error);
     }
 }
@@ -410,6 +386,8 @@ async function handleAskAdvisor(event) {
 async function loadUserRequests() {
     const loadingEl = document.getElementById('requestsLoading');
     const listEl = document.getElementById('requestsList');
+    
+    if (!loadingEl || !listEl) return;
     
     loadingEl.style.display = 'block';
     listEl.innerHTML = '';
@@ -458,7 +436,7 @@ function renderRequestsList(requests) {
             year: 'numeric'
         });
         
-        // Status display mapping (tanpa emoji, clean)
+        // Status display mapping
         const statusDisplayMap = {
             'pending': 'Menunggu',
             'on_process': 'Sedang Dikerjakan',
@@ -496,31 +474,29 @@ function renderRequestsList(requests) {
 async function cancelRequest(requestId) {
     showWarningPopup(
         'Konfirmasi Hapus',
-        'Apakah Anda yakin ingin membatalkan request ? Tindakan ini tidak dibatalkan.',
-
+        'Apakah Anda yakin ingin membatalkan request? Tindakan ini tidak dapat dibatalkan.',
         async (confirmed) => {
-            if(!confirmed) return;
+            if (!confirmed) return;
 
             try {
-                const token = localStorage.getItem('token');
-                const response = await apiCall('/api/requests/${requestId}/cancel', {
-                    method: 'PUT'
+                const response = await apiCall(`/api/requests/${requestId}/cancel`, {
+                    method: 'DELETE'
                 });
 
                 const data = await response.json();
 
                 if (response.ok) {
-                    showSuccessPopup('Berhasil !','Request Berhasil Dibatalkan !');
+                    showSuccessPopup('Berhasil!', 'Request Berhasil Dibatalkan!');
                     loadUserRequests();
                 } else {
                     showErrorPopup('Gagal', 'Gagal Membatalkan Request');
                 }
             } catch (error) {
-                showErrorPopup('Gagal Membatalkan Request');
-                console.error('Error', error );
+                showErrorPopup('Gagal', 'Gagal Membatalkan Request');
+                console.error('Error', error);
             }
         }
-    )
+    );
 }
 
 function escapeHtml(text) {
@@ -536,76 +512,14 @@ function escapeHtml(text) {
 }
 
 function showRequestNotes(notes) {
-    showSuccessPopup(`Catatan dari Advisor:\n\n${notes}`);
+    showSuccessPopup('Catatan Advisor', notes);
 }
-
-// Load user history
-async function loadUserHistory() {
-    const loadingEl = document.getElementById('historyLoading');
-    const listEl = document.getElementById('historyList');
-    
-    loadingEl.style.display = 'block';
-    listEl.innerHTML = '';
-    
-    try {
-        // Get completed requests as history
-        const response = await apiCall('/api/requests/my-requests');
-        const data = await response.json();
-        
-        if (response.ok) {
-            const completedRequests = data.requests.filter(req => req.status === 'complete');
-            renderHistoryList(completedRequests);
-        } else {
-            listEl.innerHTML = `<div class="error-message">Gagal memuat riwayat: ${data.error}</div>`;
-        }
-    } catch (error) {
-        listEl.innerHTML = '<div class="error-message">Gagal memuat riwayat</div>';
-        console.error('Error:', error);
-    } finally {
-        loadingEl.style.display = 'none';
-    }
-}
-
-function renderHistoryList(history) {
-    const listEl = document.getElementById('historyList');
-    
-    if (history.length === 0) {
-        listEl.innerHTML = '<div class="empty-message">Belum ada riwayat ERD yang selesai</div>';
-        return;
-    }
-    
-    listEl.innerHTML = '';
-    
-    history.forEach((item, index) => {
-        const historyItem = document.createElement('div');
-        historyItem.className = 'history-item';
-        
-        const completedDate = new Date(item.completed_at).toLocaleDateString('id-ID', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-        
-        historyItem.innerHTML = `
-            <div class="item-header">
-                <div class="item-title">${escapeHtml(item.query)}</div>
-                <div class="status-badge complete">✅ Selesai</div>
-            </div>
-            <div class="item-description">${escapeHtml(item.description)}</div>
-            <div class="item-meta">
-                <span>${completedDate}</span>
-                ${item.notes ? `<button class="btn-small btn-primary" onclick="showRequestNotes(\`${escapeHtml(item.notes)}\`)">Lihat Catatan</button>` : ''}
-            </div>
-        `;
-        
-        listEl.appendChild(historyItem);
-    });
-}
-
 
 // Utility functions
 function showStatus(elementId, message, type) {
     const statusElement = document.getElementById(elementId);
+    if (!statusElement) return;
+    
     statusElement.textContent = message;
     statusElement.className = `status ${type}`;
     statusElement.style.display = 'block';
@@ -613,7 +527,9 @@ function showStatus(elementId, message, type) {
 
 function hideStatus(elementId) {
     const statusElement = document.getElementById(elementId);
-    statusElement.style.display = 'none';
+    if (statusElement) {
+        statusElement.style.display = 'none';
+    }
 }
 
 // ==========================================
