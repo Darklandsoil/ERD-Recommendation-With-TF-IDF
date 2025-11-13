@@ -920,16 +920,13 @@ function renderMyERDs(erds) {
         const createdDate = erd.created_at ? new Date(erd.created_at).toLocaleDateString('id-ID') : '-';
         
         // Badge untuk mode
-        const modeBadge = erd.mode === 'manual' 
-            ? '<span class="mode-badge manual">Manual</span>' 
-            : '<span class="mode-badge from-request">Dari Request</span>';
+        // const modeBadge = erd.mode === 'manual' 
+        //     ? '<span class="mode-badge manual">Manual</span>' 
+        //     : '<span class="mode-badge from-request">Dari Request</span>';
         
         erdCard.innerHTML = `
             <div class="erd-card-header">
-                <div class="erd-card-title-row">
-                    <div class="erd-card-title">${erd.display_name}</div>
-                    ${modeBadge}
-                </div>
+                <div class="erd-card-title">${erd.display_name}</div>
                 <div class="erd-card-stats">
                     <div class="erd-card-stat">
                         <span>📋</span>

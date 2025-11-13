@@ -72,14 +72,24 @@ class ERDGenerator:
         num_entities = len(entity_names)
         
         # ADAPTIVE SPACING - semakin besar diagram, semakin besar spacing
-        if num_entities > 12:
-            x_spacing, y_spacing = 25.0, 25.0  # VERY LARGE for 13+ entities
-        elif num_entities > 8:
-            x_spacing, y_spacing = 10.0, 10.0
-        elif num_entities > 5:
-            x_spacing, y_spacing = 7.0, 7.0
+        # Entity dimensions: width=1.8, height=0.7
+        # Panjang garis horizontal: x_spacing - 1.8 (dikurangi 2x radius horizontal)
+        # Panjang garis vertikal: y_spacing - 0.7 (dikurangi 2x radius vertikal)
+        # Untuk menyamakan: y_spacing = x_spacing - 1.1
+        
+        if num_entities > 15:
+            x_spacing = 35.0  # EXTRA LARGE for 16+ entities (overlap=false)
+        elif num_entities > 12:
+            x_spacing = 25.0  # VERY LARGE for 13-15 entities (vpsc)
+        elif num_entities >= 10:
+            x_spacing = 15.0  # LARGE for 10-12 entities (vpsc/scalexy)
+        elif num_entities >= 4:
+            x_spacing = 6.0   # MEDIUM for 4-9 entities
         else:
-            x_spacing, y_spacing = 4.0, 4.0
+            x_spacing = 3.0   # SMALL for 1-3 entities
+        
+        # Y-spacing dibuat lebih kecil untuk mengkompensasi entity rectangular
+        y_spacing = x_spacing - 1.1
         
         rel_graph = {}
         for rel in relationships:
@@ -188,14 +198,16 @@ class ERDGenerator:
         rel_directions = ERDGenerator.get_relationship_directions(entity_name, positions, erd_data)
         
         # ADAPTIVE RADIUS - semakin besar diagram, semakin jauh atribut
-        if num_entities > 12:
-            base_radius, clearance = 7.0, 80  # EXTRA LARGE
-        elif num_entities > 8:
-            base_radius, clearance = 3.5, 40
-        elif num_entities > 5:
-            base_radius, clearance = 2.5, 35
+        if num_entities > 15:
+            base_radius, clearance = 4.0, 80  # EXTRA LARGE (overlap=false)
+        elif num_entities > 12:
+            base_radius, clearance = 3.5, 70  # VERY LARGE (vpsc)
+        elif num_entities > 10:
+            base_radius, clearance = 3.0, 50  # LARGE (vpsc/scalexy)
+        elif num_entities >= 4:
+            base_radius, clearance = 2.0, 35  # MEDIUM
         else:
-            base_radius, clearance = 2.0, 30
+            base_radius, clearance = 1.2, 25  # SMALL
         
         blocked_ranges = []
         for rel_dir in rel_directions:
@@ -322,7 +334,7 @@ class ERDGenerator:
         
         # ADAPTIVE SETTINGS berdasarkan ukuran diagram
         if num_entities <= 7:
-            # Small: Strict positioning
+            # Small: Strict positioning with scale (works well)
             dot.graph_attr.update({
                 'overlap': 'scale',
                 'sep': '+0.5',
@@ -331,26 +343,36 @@ class ERDGenerator:
                 'epsilon': '0.0001'
             })
             use_pin = True
-        elif num_entities <= 12:
-            # Medium: Relaxed positioning
+        elif num_entities <= 10:
+            # Medium: Use SCALEXY - better than prism, respects positions
             dot.graph_attr.update({
-                'overlap': 'prism',
-                'sep': '+3.5',       
+                'overlap': 'scalexy',  # ✅ Respects initial positions better than prism
+                'sep': '+2.0',       
                 'splines': 'line',
-                'epsilon': '0.005',
-                'maxiter': '8000'
+                'epsilon': '0.001',
+                'maxiter': '5000'
+            })
+            use_pin = False  # Allow minor adjustments
+        elif num_entities <= 15:
+            # Large: VPSC algorithm - maintains topology better
+            dot.graph_attr.update({
+                'overlap': 'vpsc',  # ✅ VPSC = Variable Placement with Separation Constraints
+                'sep': '+2.5',
+                'splines': 'line',
+                'maxiter': '8000',
+                'epsilon': '0.001'
             })
             use_pin = False
         else:
-            # Large: MAXIMUM spacing, allow slight adjustment
+            # Very Large: Use FALSE with large spacing (no overlap removal)
             dot.graph_attr.update({
-                'overlap': 'prism',
-                'sep': '+3',
+                'overlap': 'false',  # ✅ No overlap removal - relies on good spacing
+                'sep': '+3.0',
                 'splines': 'line',
                 'maxiter': '10000',
-                'epsilon': '0.001'   # More iterations
+                'epsilon': '0.0001'
             })
-            use_pin = True
+            use_pin = True  # Pin positions since spacing should be sufficient
         
         dot.node_attr.update({'fontname': 'Arial', 'fontsize': '10'})
         dot.edge_attr.update({'fontname': 'Arial Bold', 'fontsize': '9'})
@@ -366,7 +388,7 @@ class ERDGenerator:
                 
                 dot.node(entity['name'], entity['name'],
                         shape='box', style='filled',
-                        fillcolor='#2C3E50', fontcolor='white',
+                        fillcolor='white', fontcolor='black',
                         fontname='Arial Bold', fontsize='11',
                         width='1.8', height='0.7',
                         pos=pos_str)
@@ -399,14 +421,16 @@ class ERDGenerator:
                         for fk in entity.get('foreign_keys', [])
                     )
                     
-                    if is_pk:
-                        fillcolor, fontcolor, fontname = '#F39C12', '#2C3E50', 'Arial Bold'
-                    elif is_fk:
-                        fillcolor, fontcolor, fontname = '#E67E22', 'white', 'Arial Bold'
-                    else:
-                        fillcolor, fontcolor, fontname = '#27AE60', 'white', 'Arial'
+                    fillcolor = 'white'
+                    fontcolor = 'black'
+                    fontname = 'Arial Bold' if (is_pk or is_fk) else 'Arial'
                     
-                    dot.node(attr_node_id, attr,
+                    if is_pk:
+                        label = f'<<U>{attr}</U>>'
+                    else :
+                        label = attr
+                    
+                    dot.node(attr_node_id, label,
                             shape='ellipse', style='filled',
                             fillcolor=fillcolor, fontcolor=fontcolor,
                             fontname=fontname, fontsize='9',
@@ -434,7 +458,7 @@ class ERDGenerator:
                     
                     dot.node(rel_node_id, rel.get('name', rel['relation']),
                             shape='diamond', style='filled',
-                            fillcolor='#F39C12', fontcolor='white',
+                            fillcolor='white', fontcolor='black',
                             fontname='Arial Bold', fontsize='10',
                             width='1.4', height='0.8',
                             pos=pos_str)

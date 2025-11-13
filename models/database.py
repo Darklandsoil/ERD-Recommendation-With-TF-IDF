@@ -92,7 +92,7 @@ class Database:
     
     def delete_user(self, user_id):
         """Delete user (soft delete by setting is_active to False)"""
-        return self.users_collection.update_one(
+        return self.users_collection.delete_one(
             {"user_id": user_id},
             {"$set": {"is_active": False}}
         )

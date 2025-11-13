@@ -893,6 +893,7 @@ body {
     background: var(--bg-input);
     border: 2px solid var(--border-color);
     border-radius: 8px;
+    color: var(--text-primary); 
     font-size: 0.95rem;
     transition: var(--transition);
     font-family: inherit;

@@ -184,8 +184,8 @@ class AdminController:
                 return jsonify({"error": "User bukan advisor"}), 400
             
             # Soft delete advisor
-            result = db.delete_user(user_id)
-            if result.modified_count > 0:
+            result = db.hard_delete_user(user_id)
+            if result.deleted_count > 0:
                 return jsonify({"message": "Advisor berhasil dihapus"}), 200
             else:
                 return jsonify({"error": "Gagal menghapus advisor"}), 500
