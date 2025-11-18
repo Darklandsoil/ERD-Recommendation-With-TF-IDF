@@ -134,9 +134,9 @@ class ERDGenerator:
                 
                 if target not in placed:
                     if layout == 'TB':
-                        positions[target] = (current_pos[0], current_pos[1] + y_spacing)
-                    elif layout == 'BT':
                         positions[target] = (current_pos[0], current_pos[1] - y_spacing)
+                    elif layout == 'BT':
+                        positions[target] = (current_pos[0], current_pos[1] + y_spacing)
                     elif layout == 'LR':
                         positions[target] = (current_pos[0] + x_spacing, current_pos[1])
                     elif layout == 'RL':

@@ -36,6 +36,11 @@ def advisor_dashboard():
     """Advisor dashboard"""
     return render_template("advisor_dashboard.html")
 
+@main_bp.route("/erd-builder")
+def erd_builder():
+    """ERD Builder page"""
+    return render_template("erd-builder.html")
+
 @main_bp.route("/admin-dashboard")
 def admin_dashboard():
     """Admin dashboard"""

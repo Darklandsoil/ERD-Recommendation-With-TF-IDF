@@ -6,108 +6,175 @@ let entityCounter = 0;
 let relationshipCounter = 0;
 
 // Initialize advisor dashboard
+// Initialize advisor dashboard
 function initAdvisorDashboard() {
     // Display advisor welcome message
     const user = getUser();
     document.getElementById('advisorWelcome').textContent = `Selamat datang, ${user.fullname}!`;
     
-    // Initialize tab navigation
+    // Initialize tab navigation FIRST
     initAdvisorTabNavigation();
     
     // Initialize modals
     initAdvisorModals();
     
-    // Initialize ERD form
-    initERDForm();
+    // DON'T load data here - let tab switching handle it
+    // Remove: loadPendingRequests();
     
-    // Load initial data
-    loadPendingRequests();
+    // Load data based on current active tab
+    loadDataForActiveTab();
 }
 
-// Tab navigation
+// Make closeRequestModal available globally for inline onclick
+window.closeRequestModal = function() {
+    const modal = document.getElementById('requestModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    currentRequest = null;
+};
+
+// NEW FUNCTION: Load data based on active tab
+function loadDataForActiveTab() {
+    const activeTab = document.querySelector('.tab-content.active');
+    if (!activeTab) return;
+    
+    const tabId = activeTab.id;
+    
+    console.log('Loading data for tab:', tabId);
+    
+    switch(tabId) {
+        case 'pending-tab':
+            loadPendingRequests();
+            break;
+        case 'assigned-tab':
+            loadAssignedRequests();
+            break;
+        case 'create-tab':
+            loadMyERDs();
+            break;
+        case 'history-tab':
+            loadAdvisorHistory();
+            break;
+    }
+}
+
+
+
+// PERBAIKI Tab navigation - Remove duplicate handlers
 function initAdvisorTabNavigation() {
     const menuItems = document.querySelectorAll('.menu-item');
     const tabContents = document.querySelectorAll('.tab-content');
     
     menuItems.forEach(item => {
+        // Remove inline onclick, use ONLY event listener
+        item.removeAttribute('onclick');
+        
         item.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Remove active class from all items
-            menuItems.forEach(i => i.classList.remove('active'));
-            tabContents.forEach(t => t.classList.remove('active'));
-            
-            // Add active class to clicked item
-            this.classList.add('active');
-            
-            // Show corresponding tab content
-            const tabId = this.getAttribute('data-tab') + '-tab';
-            document.getElementById(tabId).classList.add('active');
-            
-            // Load data based on tab
-            if (tabId === 'pending-tab') {
-                loadPendingRequests();
-            } else if (tabId === 'assigned-tab') {
-                loadAssignedRequests();
-            } else if (tabId === 'create-tab') {
-                loadMyERDs();
-            } else if (tabId === 'history-tab') {
-                loadAdvisorHistory();
-            }
+            const tabName = this.getAttribute('data-tab');
+            switchTabProgrammatically(tabName);
         });
     });
 }
 
+// NEW: Centralized tab switching function
+function switchTabProgrammatically(tabName) {
+    console.log('Switching to tab:', tabName);
+    
+    const menuItems = document.querySelectorAll('.menu-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Remove active class from all
+    menuItems.forEach(i => i.classList.remove('active'));
+    tabContents.forEach(t => t.classList.remove('active'));
+    
+    // Add active class to selected
+    const selectedMenuItem = document.querySelector(`[data-tab="${tabName}"]`);
+    const selectedTab = document.getElementById(tabName + '-tab');
+    
+    if (selectedMenuItem) selectedMenuItem.classList.add('active');
+    if (selectedTab) selectedTab.classList.add('active');
+    
+    // Update URL hash
+    history.pushState(null, null, '#' + tabName);
+    
+    // Load data for this tab
+    switch(tabName) {
+        case 'pending':
+            loadPendingRequests();
+            break;
+        case 'assigned':
+            loadAssignedRequests();
+            break;
+        case 'create':
+            loadMyERDs();
+            break;
+        case 'history':
+            loadAdvisorHistory();
+            break;
+    }
+}
+
 // Initialize modals
 function initAdvisorModals() {
-    // Request modal
-    document.getElementById('closeRequestModal').addEventListener('click', closeRequestModal);
-    
-    // ERD creation modal
-    document.getElementById('closeERDModal').addEventListener('click', closeERDCreationModal);
+    // Request modal close button
+    const closeRequestModalBtn = document.getElementById('closeRequestModal');
+    if (closeRequestModalBtn) {
+        closeRequestModalBtn.addEventListener('click', closeRequestModal);
+    }
     
     // Assign request button
-    document.getElementById('assignRequestBtn').addEventListener('click', handleAssignRequest);
+    const assignRequestBtn = document.getElementById('assignRequestBtn');
+    if (assignRequestBtn) {
+        assignRequestBtn.addEventListener('click', handleAssignRequest);
+    }
     
-    // Create ERD button
-    document.getElementById('createERDBtn').addEventListener('click', openERDCreationModal);
+    // Create ERD button (redirects to erd-builder)
+    const createERDBtn = document.getElementById('createERDBtn');
+    if (createERDBtn) {
+        createERDBtn.addEventListener('click', function() {
+            if (currentRequest) {
+                startERDCreation(currentRequest.request_id);
+            }
+        });
+    }
     
     // Close modals when clicking outside
-    window.addEventListener('click', function(event) {
-        const requestModal = document.getElementById('requestModal');
-        const erdModal = document.getElementById('erdCreationModal');
-        
-        if (event.target === requestModal) {
-            requestModal.style.display = 'none';
-        }
-        if (event.target === erdModal) {
-            erdModal.style.display = 'none';
-        }
-    });
+    const requestModal = document.getElementById('requestModal');
+    if (requestModal) {
+        requestModal.addEventListener('click', function(event) {
+            if (event.target === requestModal) {
+                closeRequestModal();
+            }
+        });
+    }
 }
 
 // Load pending requests
 async function loadPendingRequests() {
-    const loadingEl = document.getElementById('pendingLoading');
     const listEl = document.getElementById('pendingList');
     
-    loadingEl.style.display = 'block';
     listEl.innerHTML = '';
     
     try {
         const response = await apiCall('/api/requests/pending');
+        console.log('📡 API Response status:', response.status);
+        
         const data = await response.json();
+        console.log('📦 API Data:', data);
         
         if (response.ok) {
+            console.log(`✅ Rendering ${data.requests.length} pending requests`);
             renderPendingRequests(data.requests);
         } else {
+            console.error('❌ API Error:', data.error);
             listEl.innerHTML = `<div class="error-message">Gagal memuat requests: ${data.error}</div>`;
         }
     } catch (error) {
+        console.error('❌ Exception:', error);
         listEl.innerHTML = '<div class="error-message">Gagal memuat requests</div>';
-        console.error('Error:', error);
-    } finally {
-        loadingEl.style.display = 'none';
     }
 }
 
@@ -180,10 +247,8 @@ function renderPendingRequests(requests) {
 
 // Load assigned requests
 async function loadAssignedRequests() {
-    const loadingEl = document.getElementById('assignedLoading');
     const listEl = document.getElementById('assignedList');
     
-    loadingEl.style.display = 'block';
     listEl.innerHTML = '';
     
     try {
@@ -198,9 +263,7 @@ async function loadAssignedRequests() {
     } catch (error) {
         listEl.innerHTML = '<div class="error-message">Gagal memuat requests</div>';
         console.error('Error:', error);
-    } finally {
-        loadingEl.style.display = 'none';
-    }
+    } 
 }
 
 function renderAssignedRequests(requests) {
@@ -350,63 +413,18 @@ async function handleAssignRequest() {
     closeRequestModal();
 }
 
-// ERD Creation functions
+// ERD Creation functions - Redirect to erd-builder.html
 function startERDCreation(requestId) {
-    currentRequest = { request_id: requestId };
-    openERDCreationModal();
+    // Redirect to erd-builder with from_request mode
+    window.location.href = `/erd-builder?mode=from_request&request_id=${requestId}`;
 }
 
-function openERDCreationModal() {
-    if (!currentRequest) {
-        showErrorPopup('Pilih request terlebih dahulu');
-        return;
-    }
-    
-    // Reset form
-    resetERDForm();
-    
-    const modal = document.getElementById('erdCreationModal');
-    modal.style.display = 'block';
-}
+// ERD Form Management - Not needed anymore (using erd-builder.html)
 
-function closeERDCreationModal() {
-    document.getElementById('erdCreationModal').style.display = 'none';
-    resetERDForm();
-    editingErdId = null;
-    currentRequest = null;
-    
-    // Reset submit button text
-    const submitBtn = document.querySelector('#erdForm button[type="submit"]');
-    if (submitBtn) {
-        submitBtn.textContent = '💾 Simpan & Kirim ERD';
-    }
-    
-    // Reset modal title
-    document.getElementById('erdCreationTitle').textContent = 'Buat ERD';
-}
-
-// ERD Form Management
-function initERDForm() {
-    document.getElementById('addEntityBtn').addEventListener('click', addEntity);
-    document.getElementById('addRelationshipBtn').addEventListener('click', addRelationship);
-    document.getElementById('erdForm').addEventListener('submit', handleERDSubmission);
-}
-
-function resetERDForm() {
-    entities = [];
-    relationships = [];
-    entityCounter = 0;
-    relationshipCounter = 0;
-    
-    document.getElementById('erdName').value = '';
-    document.getElementById('erdNotes').value = '';
-    document.getElementById('entitiesContainer').innerHTML = '';
-    document.getElementById('relationshipsContainer').innerHTML = '';
-}
-
-function addEntity() {
-    const container = document.getElementById('entitiesContainer');
-    const entityId = `entity_${++entityCounter}`;
+// Load advisor history
+async function loadAdvisorHistory() {
+    const loadingEl = document.getElementById('advisorHistoryLoading');
+    const listEl = document.getElementById('advisorHistoryList');
     
     const entityDiv = document.createElement('div');
     entityDiv.className = 'entity-item';
@@ -875,10 +893,8 @@ document.addEventListener('input', function(e) {
 
 // Load advisor's own ERDs
 async function loadMyERDs() {
-    const loadingEl = document.getElementById('myERDsLoading');
     const listEl = document.getElementById('myERDsList');
     
-    loadingEl.style.display = 'block';
     listEl.innerHTML = '';
     
     try {
@@ -893,9 +909,7 @@ async function loadMyERDs() {
     } catch (error) {
         listEl.innerHTML = '<div class="error-message">Gagal memuat ERD</div>';
         console.error('Error:', error);
-    } finally {
-        loadingEl.style.display = 'none';
-    }
+    } 
 }
 
 function renderMyERDs(erds) {
@@ -959,23 +973,10 @@ function renderMyERDs(erds) {
     });
 }
 
-// Open direct ERD creation modal
+// Open direct ERD creation - Redirect to erd-builder
 function openDirectERDCreation() {
-    currentRequest = null; // No request association
-    editingErdId = null; // Clear editing context
-    
-    // Reset form
-    resetERDForm();
-    
-    // Change modal title
-    document.getElementById('erdCreationTitle').textContent = 'Buat ERD Baru (Langsung)';
-    
-    // Change submit button text
-    const submitBtn = document.querySelector('#erdForm button[type="submit"]');
-    submitBtn.textContent = '💾 Simpan & Kirim ERD';
-    
-    // Show modal
-    document.getElementById('erdCreationModal').style.display = 'block';
+    // Redirect to erd-builder with manual mode
+    window.location.href = '/erd-builder?mode=manual';
 }
 
 // View ERD image
@@ -1025,226 +1026,8 @@ async function deleteERDById(erdId, displayName) {
     );
 }
 
-// Edit ERD
-let editingErdId = null;
-
-async function editERD(erdId) {
-    try {
-        const response = await apiCall(`/api/erd/${erdId}`);
-        const data = await response.json();
-        
-        if (!response.ok) {
-            showErrorPopup(`Gagal memuat ERD: ${data.error}`);
-            return;
-        }
-        
-        const erd = data.erd;
-        editingErdId = erdId;
-        currentRequest = null; // Clear request context for manual edit
-        
-        // ✅ PERBAIKAN 1: Reset TOTAL sebelum load data
-        // Pastikan semua state benar-benar bersih
-        entities = [];
-        relationships = [];
-        entityCounter = 0;
-        relationshipCounter = 0;
-        
-        // Clear DOM containers
-        document.getElementById('entitiesContainer').innerHTML = '';
-        document.getElementById('relationshipsContainer').innerHTML = '';
-        
-        // Reset form inputs
-        document.getElementById('erdName').value = '';
-        document.getElementById('erdNotes').value = '';
-        
-        // ✅ PERBAIKAN 2: Populate form dengan data FRESH
-        document.getElementById('erdName').value = erd.name;
-        document.getElementById('erdNotes').value = '';
-        
-        // Change modal title
-        document.getElementById('erdCreationTitle').textContent = 'Edit ERD';
-        
-        // ✅ PERBAIKAN 3: Populate entities dengan tracking yang benar
-        erd.entities.forEach((entity, index) => {
-            addEntity(); // Ini akan increment entityCounter
-            
-            const currentEntityId = `entity_${entityCounter}`;
-            const entityDiv = document.querySelector(`[data-entity-id="${currentEntityId}"]`);
-            
-            if (entityDiv) {
-                entityDiv.querySelector('.entity-name').value = entity.name;
-                entityDiv.querySelector('.entity-pk').value = entity.primary_key || '';
-                
-                // Update entity in array (gunakan index terakhir yang baru ditambahkan)
-                const lastEntityIndex = entities.length - 1;
-                entities[lastEntityIndex].name = entity.name;
-                entities[lastEntityIndex].attributes = []; // Reset dulu
-                entities[lastEntityIndex].primary_key = entity.primary_key || '';
-                
-                // ✅ PERBAIKAN 4: Add attributes dengan memastikan tidak ada duplikasi
-                (entity.attributes || []).forEach(attr => {
-                    // Cek apakah attribute sudah ada (extra safety)
-                    if (!entities[lastEntityIndex].attributes.includes(attr)) {
-                        const input = entityDiv.querySelector('.new-attribute');
-                        input.value = attr;
-                        addAttribute(currentEntityId);
-                    }
-                });
-            }
-        });
-        
-        // ✅ PERBAIKAN 5: Update relationship options SETELAH semua entities ready
-        updateRelationshipOptions();
-        
-        // Wait a bit to ensure DOM is fully updated
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // ✅ PERBAIKAN 6: Populate relationships
-        erd.relationships.forEach(rel => {
-            addRelationship(); // Ini akan increment relationshipCounter
-            
-            const currentRelId = `relationship_${relationshipCounter}`;
-            const relDiv = document.querySelector(`[data-relationship-id="${currentRelId}"]`);
-            
-            if (relDiv) {
-                relDiv.querySelector('.relationship-entity1').value = rel.entity1;
-                relDiv.querySelector('.relationship-entity2').value = rel.entity2;
-                relDiv.querySelector('.relationship-name').value = rel.relation;
-                relDiv.querySelector('.relationship-type').value = rel.type;
-                relDiv.querySelector('.relationship-layout').value = rel.layout;
-            }
-        });
-        
-        // Change submit button text
-        const submitBtn = document.querySelector('#erdForm button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.textContent = '💾 Update ERD';
-        }
-        
-        // Show modal
-        document.getElementById('erdCreationModal').style.display = 'block';
-        
-        // ✅ PERBAIKAN 7: Log untuk debugging
-        console.log('Edit ERD loaded:', {
-            erdId: erdId,
-            entitiesCount: entities.length,
-            relationshipsCount: relationships.length,
-            entityCounter: entityCounter,
-            relationshipCounter: relationshipCounter
-        });
-        
-    } catch (error) {
-        showErrorPopup('Gagal memuat ERD untuk diedit');
-        console.error('Error:', error);
-    }
+// Edit ERD - Redirect to erd-builder
+function editERD(erdId) {
+    // Redirect to erd-builder with edit mode
+    window.location.href = `/erd-builder?mode=edit&erd_id=${erdId}`;
 }
-
-// Update ERD
-async function updateERD(erdId, erdData) {
-    try {
-        const response = await apiCall(`/api/erd/${erdId}`, {
-            method: 'PUT',
-            body: JSON.stringify(erdData)
-        });
-        
-        const data = await response.json();
-        
-        if (response.ok) {
-            showSuccessPopup('ERD berhasil diupdate!');
-            closeERDCreationModal();
-            loadMyERDs();
-            editingErdId = null;
-        } else {
-            showErrorPopup(`Gagal mengupdate ERD: ${data.error}`);
-        }
-    } catch (error) {
-        showErrorPopup('Gagal mengupdate ERD');
-        console.error('Error:', error);
-    }
-}
-
-// ==========================================
-// MODERN POPUP SYSTEM
-// ==========================================
-
-// SUCCESS POPUP (Hijau)
-function showSuccessPopup(title, message) {
-    document.getElementById('successPopupTitle').textContent = title;
-    document.getElementById('successPopupMessage').textContent = message;
-    document.getElementById('successPopup').classList.remove('hidden');
-}
-
-function closeSuccessPopup() {
-    document.getElementById('successPopup').classList.add('hidden');
-}
-
-// WARNING POPUP (Orange) - dengan callback
-let warningCallback = null;
-
-function showWarningPopup(title, message, callback) {
-    document.getElementById('warningPopupTitle').textContent = title;
-    document.getElementById('warningPopupMessage').textContent = message;
-    document.getElementById('warningPopup').classList.remove('hidden');
-    warningCallback = callback;
-}
-
-function closeWarningPopup(confirmed) {
-    document.getElementById('warningPopup').classList.add('hidden');
-    if (warningCallback) {
-        warningCallback(confirmed);
-        warningCallback = null;
-    }
-}
-
-// ERROR POPUP (Merah)
-function showErrorPopup(title, message) {
-    document.getElementById('errorPopupTitle').textContent = title;
-    document.getElementById('errorPopupMessage').textContent = message;
-    document.getElementById('errorPopup').classList.remove('hidden');
-}
-
-function closeErrorPopup() {
-    document.getElementById('errorPopup').classList.add('hidden');
-}
-
-// Close popup on overlay click
-document.addEventListener('DOMContentLoaded', function() {
-    // Success popup
-    const successPopup = document.getElementById('successPopup');
-    if (successPopup) {
-        successPopup.addEventListener('click', function(e) {
-            if (e.target === this) closeSuccessPopup();
-        });
-    }
-    
-    // Warning popup
-    const warningPopup = document.getElementById('warningPopup');
-    if (warningPopup) {
-        warningPopup.addEventListener('click', function(e) {
-            if (e.target === this) closeWarningPopup(false);
-        });
-    }
-    
-    // Error popup
-    const errorPopup = document.getElementById('errorPopup');
-    if (errorPopup) {
-        errorPopup.addEventListener('click', function(e) {
-            if (e.target === this) closeErrorPopup();
-        });
-    }
-});
-
-// Close popup on ESC key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        if (!document.getElementById('successPopup').classList.contains('hidden')) {
-            closeSuccessPopup();
-        }
-        if (!document.getElementById('warningPopup').classList.contains('hidden')) {
-            closeWarningPopup(false);
-        }
-        if (!document.getElementById('errorPopup').classList.contains('hidden')) {
-            closeErrorPopup();
-        }
-    }
-});
