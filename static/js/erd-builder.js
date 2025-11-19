@@ -10,6 +10,10 @@ let entityCounter = 0;
 let relationshipCounter = 0;
 let currentSVG = null;
 let graphviz = null;
+let currentZoom = 1.0; // Zoom level (1.0 = 100%)
+const ZOOM_STEP = 0.1; // 10% per step
+const MIN_ZOOM = 0.3; // 30%
+const MAX_ZOOM = 3.0; // 300%
 
 // Mode & Context
 let currentMode = 'manual'; // 'manual', 'from_request', 'edit'
@@ -53,6 +57,9 @@ window.addEventListener('load', async function() {
         renderEntitiesForm();
         renderRelationshipsForm();
     }
+
+    //SETUP ZOOM CONTROLS
+     setupZoomControls();
 });
 
 // Add Entity
@@ -465,6 +472,9 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
     const relDirections = getRelationshipDirections(entityName, positions);
     
     const numEntities = entities.length;
+
+    const numRelations = relDirections.length; // ← TAMBAHAN: hitung jumlah relasi
+    
     let baseRadius, clearance;
     if (numEntities >= 15) {
         baseRadius = 2.0;
@@ -476,6 +486,18 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
         baseRadius = 1.5;
         clearance = 30;
     }
+    
+     // ========================================
+    // ✨ ADAPTIVE CLEARANCE + RADIUS REDUCTION
+    // ========================================
+    let radiusMultiplier = 1.0; // Default: no reduction
+    
+    if (numRelations >= 2 && numAttrs >= 5) {
+        // Entitas dengan 2+ relasi dan 5+ atribut
+        clearance = Math.max(20, clearance * 0.6);
+        console.log(`🎯 Light case for ${entityName}: clearance=${clearance}°, ${numRelations} relations, ${numAttrs} attrs`);
+    }
+    // ========================================
     
     const blockedRanges = [];
     relDirections.forEach(relDir => {
@@ -526,7 +548,13 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
     attrs.forEach((attr, i) => {
         const angle = selectedAngles[i];
         const angleRad = (angle * Math.PI) / 180;
-        const radius = baseRadius * (1.0 + (i % 3) * 0.15);
+        
+        // ========================================
+        // ✨ ADAPTIVE RADIUS dengan multiplier
+        // ========================================
+        const radiusVariance = (i % 3) * 0.15 * radiusMultiplier;
+        const radius = baseRadius * (1.0 + radiusVariance);
+        // ========================================
         
         const attrX = entityPos.x + radius * Math.cos(angleRad);
         const attrY = entityPos.y + radius * Math.sin(angleRad);
@@ -547,8 +575,8 @@ function generateDOT() {
     dot += '  layout="neato";\n';
     
     if (numEntities <= 10) {
-        dot += '  overlap="scale";\n';
-        dot += '  sep="+0.5";\n';
+        dot += '  overlap="scalexy";\n';
+        dot += '  sep="+0.2";\n';
     } else if (numEntities <= 15) {
         dot += '  overlap="scalexy";\n';
         dot += '  sep="+2.0";\n';
@@ -603,6 +631,38 @@ function generateDOT() {
             const fontcolor = 'black';
             const fontname = isPK ? 'Arial Bold' : 'Arial';
             const label = isPK ? `<<U>${attr}</U>>` : attr;
+
+            const numRelations = relationships.filter(r => 
+                r.entity1 === entityName || r.entity2 === entityName
+            ).length;
+            
+            let attrWidth = 1.2;
+            let attrHeight = 0.5;
+            let attrFontSize = 9;
+            
+            if (numRelations >= 3 && entity.attributes.length >= 8) {
+                // Kasus ekstrem: atribut lebih kecil
+                attrWidth = 0.85;
+                attrHeight = 0.38;
+                attrFontSize = 7.5;
+            }  else if (numRelations >= 3 && entity.attributes.length >= 9) {
+                // Extreme 9
+                attrWidth = 0.80;
+                attrHeight = 0.36;
+                attrFontSize = 7.5;
+            }else if (numRelations >= 3 && entity.attributes.length >= 6) {
+                attrWidth = 1.2;
+                attrHeight = 0.5;
+                attrFontSize = 8;
+            } else if (numRelations >= 2 && entity.attributes.length >= 10) {
+                attrWidth = 0.90;
+                attrHeight = 0.40;
+                attrFontSize = 7.5;
+            } else if (numRelations >= 2 && entity.attributes.length >= 8) {
+                attrWidth = 1.0;
+                attrHeight = 0.44;
+                attrFontSize = 8;
+            }
             
             dot += `  "${attrId}" [\n`;
             dot += `    shape=ellipse,\n`;
@@ -610,9 +670,9 @@ function generateDOT() {
             dot += `    fillcolor="${fillcolor}",\n`;
             dot += `    fontcolor="${fontcolor}",\n`;
             dot += `    fontname="${fontname}",\n`;
-            dot += `    fontsize=9,\n`;
-            dot += `    width=1.2,\n`;
-            dot += `    height=0.5,\n`;
+            dot += `    fontsize=${attrFontSize},\n`;
+            dot += `    width=${attrWidth},\n`;
+            dot += `    height=${attrHeight},\n`;
             dot += `    label=${label},\n`;
             dot += `    pos="${attrPosStr}"\n`;
             dot += `  ];\n`;
@@ -739,11 +799,22 @@ async function updatePreview() {
 
         currentSVG = svgWrapper.querySelector('svg');
         
+        // ============================================
+        // 🔥 CRITICAL FIX: Jangan ubah style SVG!
+        // ============================================
         if (currentSVG) {
-            currentSVG.style.maxWidth = '100%';
-            currentSVG.style.height = 'auto';
+            // HAPUS baris ini yang menyebabkan zoom out:
+            // currentSVG.style.maxWidth = '100%';
+            // currentSVG.style.height = 'auto';
+            
+            // GANTI dengan: Biarkan SVG menggunakan ukuran aslinya
+            currentSVG.removeAttribute('style');
+            
+            // Optional: Tambahkan style yang tidak mengubah ukuran
+            currentSVG.style.display = 'block';
         }
-
+        // ============================================
+        applyZoom();
         console.log('✅ Preview updated successfully');
     } catch (error) {
         console.error('❌ Error generating preview:', error);
@@ -1108,6 +1179,74 @@ async function saveERD() {
     }
 }
 
+// ========================================
+// ZOOM FUNCTION
+// ========================================
+
+// Update zoom display
+function updateZoomDisplay() {
+    const zoomDisplay = document.getElementById('zoomLevel');
+    if (zoomDisplay) {
+        zoomDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+}
+
+// Apply zoom transformation
+function applyZoom() {
+    const svgWrapper = document.querySelector('.preview-container .svg-wrapper');
+    if (svgWrapper) {
+        svgWrapper.style.transform = `scale(${currentZoom})`;
+    }
+    updateZoomDisplay();
+}
+
+// Zoom In function
+function zoomIn() {
+    if (currentZoom < MAX_ZOOM) {
+        currentZoom = Math.min(currentZoom + ZOOM_STEP, MAX_ZOOM);
+        applyZoom();
+    }
+}
+
+// Zoom Out function
+function zoomOut() {
+    if (currentZoom > MIN_ZOOM) {
+        currentZoom = Math.max(currentZoom - ZOOM_STEP, MIN_ZOOM);
+        applyZoom();
+    }
+}
+
+// Reset Zoom to 100%
+function resetZoom() {
+    currentZoom = 1.0;
+    applyZoom();
+}
+
+// Setup zoom controls (panggil saat initialization)
+function setupZoomControls() {
+    const previewContainer = document.getElementById('previewContainer');
+    if (previewContainer) {
+        // Mouse wheel zoom support (Ctrl + Scroll)
+        previewContainer.addEventListener('wheel', function(e) {
+            // Only zoom if Ctrl key is pressed
+            if (e.ctrlKey) {
+                e.preventDefault();
+                
+                if (e.deltaY < 0) {
+                    // Scroll up = Zoom in
+                    zoomIn();
+                } else {
+                    // Scroll down = Zoom out
+                    zoomOut();
+                }
+            }
+        }, { passive: false });
+    }
+    
+    // Initialize zoom display
+    updateZoomDisplay();
+}
+
 // Reset form
 function resetForm() {
     entities = [];
@@ -1128,4 +1267,7 @@ function resetForm() {
     `;
     
     document.getElementById('successMessage').style.display = 'none';
+
+    currentZoom = 1.0; // TAMBAHKAN INI
+    updateZoomDisplay(); // TAMBAHKAN INI
 }

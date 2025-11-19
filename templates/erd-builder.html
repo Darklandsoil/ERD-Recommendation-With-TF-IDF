@@ -59,6 +59,16 @@
             <div class="preview-header">
                 <h3>🖼️ Preview ERD</h3>
                 <div class="preview-controls">
+                    <button class="btn btn-primary" onclick="zoomOut()" title="Zoom Out">
+                        🔍−
+                    </button>
+                    <span id="zoomLevel" style="color: var(--text-primary); font-weight: 600; min-width: 60px; text-align: center; display: inline-block;">100%</span>
+                    <button class="btn btn-primary" onclick="zoomIn()" title="Zoom In">
+                        🔍+
+                    </button>
+                    <button class="btn btn-primary" onclick="resetZoom()" title="Reset Zoom">
+                        ⟲
+                    </button>
                     <button class="btn btn-info" onclick="downloadSVG()">
                         ⬇️ Download SVG
                     </button>

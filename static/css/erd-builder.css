@@ -49,6 +49,9 @@ body {
 /* Left Panel - Form */
 .form-panel {
     width: 400px;
+    min-width: 400px;  /* 🔥 PENTING: Jangan biarkan form mengecil! */
+    max-width: 400px;  /* 🔥 PENTING: Lock ukuran form */
+    flex-shrink: 0;
     background: var(--bg-input);
     padding: 25px;
     overflow-y: auto;
@@ -205,6 +208,11 @@ body {
     margin-top: 10px;
 }
 
+.attribute-list label {
+    color: var(--text-primary);
+}
+
+
 .attribute-item {
     display: flex;
     justify-content: space-between;
@@ -261,6 +269,8 @@ body {
 /* Right Panel - Preview */
 .preview-panel {
     flex: 1;
+    min-width: 0;       /* Allow untuk shrink dengan scroll */
+    overflow: hidden;  
     display: flex;
     flex-direction: column;
     background: var(--bg-input);
@@ -285,27 +295,50 @@ body {
     align-items: center;
 }
 
+/* ============================================
+   🔥 FIXED: Preview Container Scrolling
+   ============================================ */
 .preview-container {
     flex: 1;
     background: white;
     border-radius: 8px;
     border: 2px solid var(--border-color);
-    overflow: auto;
+    /* PERBAIKAN UTAMA: Enable scroll horizontal & vertikal */
+    overflow: auto !important;
     position: relative;
     padding: 20px;
+    /* Tambahan untuk smooth scrolling */
+    scroll-behavior: smooth;
+    cursor: grab;
 }
 
+.preview-container:active {
+    cursor: grabbing;
+}
+
+/* SVG Wrapper - Allow content to expand naturally */
 .preview-container .svg-wrapper {
-    min-width: 100%;
-    min-height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: inline-block !important;
+    width: auto !important;
+    height: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    transform-origin: top left;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* SVG Element - Keep original size, no scaling */
 .preview-container svg {
-    display: block;
-    margin: 0 auto;
+    display: block !important;
+    /* CRITICAL: Jangan ubah ukuran SVG yang sudah di-generate */
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
 }
 
 .loading-overlay {
@@ -390,23 +423,39 @@ body {
     color: white;
 }
 
-/* Scrollbar */
+/* Scrollbar Styling - Enhanced untuk visibility */
 ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
 }
 
 ::-webkit-scrollbar-track {
     background: var(--bg-dark);
-}
-
-::-webkit-scrollbar-thumb {
-    background: var(--success-color);
     border-radius: 4px;
 }
 
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+    border: 2px solid var(--bg-dark);
+}
+
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--success-color);
+    background: var(--primary-hover);
+}
+
+/* Scrollbar untuk preview container (light background) */
+.preview-container::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.preview-container::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border: 2px solid #f1f5f9;
+}
+
+.preview-container::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-hover);
 }
 
 /* Responsive Design */
