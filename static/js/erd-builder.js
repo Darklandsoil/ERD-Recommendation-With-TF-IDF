@@ -103,7 +103,8 @@ function addRelationship() {
         entity2: '',
         relation: '',
         type: 'one-to-many',
-        layout: 'LR'
+        layout: 'LR',
+        attributes: [] // Support for relationship attributes (many-to-many)
     };
     relationships.push(rel);
     renderRelationshipsForm();
@@ -157,6 +158,34 @@ function removeAttribute(entityId, index) {
         entity.attributes.splice(index, 1);
         console.log('After:', entity.attributes);
         renderEntitiesForm();
+        updatePreview();
+    }
+}
+
+// Add Relationship Attribute (for many-to-many)
+function addRelationshipAttribute(relId) {
+    const input = document.getElementById(`newRelAttr_${relId}`);
+    const attrName = input.value.trim();
+    if (!attrName) return;
+
+    const rel = relationships.find(r => r.id === relId);
+    if (rel) {
+        if (!rel.attributes) {
+            rel.attributes = [];
+        }
+        rel.attributes.push(attrName);
+        input.value = '';
+        renderRelationshipsForm();
+        updatePreview();
+    }
+}
+
+// Remove Relationship Attribute
+function removeRelationshipAttribute(relId, index) {
+    const rel = relationships.find(r => r.id === relId);
+    if (rel && rel.attributes) {
+        rel.attributes.splice(index, 1);
+        renderRelationshipsForm();
         updatePreview();
     }
 }
@@ -243,7 +272,11 @@ function renderRelationshipsForm() {
         return;
     }
 
-    container.innerHTML = relationships.map((rel, idx) => `
+    container.innerHTML = relationships.map((rel, idx) => {
+        const isManyToMany = rel.type === 'many-to-many';
+        const relAttributes = rel.attributes || [];
+        
+        return `
         <div class="entity-card" data-relationship-id="${rel.id}">
             <div class="entity-header">
                 <h4>Relasi ${idx + 1}</h4>
@@ -283,7 +316,7 @@ function renderRelationshipsForm() {
 
             <div class="form-group">
                 <label>Kardinalitas:</label>
-                <select class="relationship-type" onchange="updateRelationship('${rel.id}', 'type', this.value)">
+                <select class="relationship-type" onchange="updateRelationship('${rel.id}', 'type', this.value); renderRelationshipsForm(); updatePreview();">
                     <option value="one-to-one" ${rel.type === 'one-to-one' ? 'selected' : ''}>One to One</option>
                     <option value="one-to-many" ${rel.type === 'one-to-many' ? 'selected' : ''}>One to Many</option>
                     <option value="many-to-one" ${rel.type === 'many-to-one' ? 'selected' : ''}>Many to One</option>
@@ -300,8 +333,48 @@ function renderRelationshipsForm() {
                     <option value="BT" ${rel.layout === 'BT' ? 'selected' : ''}>Bottom to Top</option>
                 </select>
             </div>
+
+            ${isManyToMany ? `
+            <div class="attribute-list" style="margin-top: 15px;">
+                <label style="color: #2563eb; font-weight: 600;">
+                    ⚡ Atribut Relasi (Many-to-Many):
+                </label>
+                <div style="font-size: 11px; color: #64748b; margin-bottom: 8px;">
+                    Atribut yang melekat pada relasi ini
+                </div>
+                ${relAttributes.map((attr, i) => `
+                    <div class="attribute-item">
+                        <span>${attr}</span>
+                        <button class="btn btn-danger btn-remove-rel-attr" style="padding: 2px 6px; font-size: 11px;"
+                                type="button"
+                                data-rel-id="${rel.id}" data-attr-index="${i}">×</button>
+                    </div>
+                `).join('')}
+
+                <div class="add-attribute">
+                    <input type="text" id="newRelAttr_${rel.id}" 
+                           placeholder="Atribut relasi baru"
+                           onkeypress="if(event.key==='Enter') { event.preventDefault(); addRelationshipAttribute('${rel.id}'); return false; }">
+                    <button class="btn btn-success" style="padding: 6px 10px;"
+                            type="button"
+                            onclick="addRelationshipAttribute('${rel.id}'); return false;">+</button>
+                </div>
+            </div>
+            ` : ''}
         </div>
-    `).join('');
+        `;
+    }).join('');
+    
+    // Add event delegation for remove buttons
+    container.querySelectorAll('.btn-remove-rel-attr').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const relId = this.getAttribute('data-rel-id');
+            const index = parseInt(this.getAttribute('data-attr-index'));
+            removeRelationshipAttribute(relId, index);
+        });
+    });
 }
 
 // Calculate positions for entities
@@ -461,6 +534,90 @@ function getRelationshipDirections(entityName, positions) {
     });
     
     return directions;
+}
+
+// Distribute relationship attributes around diamond (for many-to-many)
+function distributeRelationshipAttributes(relId, relPos, attrs, positions, entity1, entity2) {
+    const numAttrs = attrs.length;
+    if (numAttrs === 0) return {};
+    
+    const attrPositions = {};
+    const baseRadius = 1.3; // Distance from relationship center
+    
+    // Calculate angles to avoid (where entities connect to relationship)
+    const e1Pos = positions[entity1];
+    const e2Pos = positions[entity2];
+    
+    const blockedAngles = [];
+    if (e1Pos) {
+        const angle1 = Math.atan2(e1Pos.y - relPos.y, e1Pos.x - relPos.x) * (180 / Math.PI);
+        blockedAngles.push(((angle1 % 360) + 360) % 360);
+    }
+    if (e2Pos) {
+        const angle2 = Math.atan2(e2Pos.y - relPos.y, e2Pos.x - relPos.x) * (180 / Math.PI);
+        blockedAngles.push(((angle2 % 360) + 360) % 360);
+    }
+    
+    // Create clearance zones around blocked angles
+    const clearance = 45; // degrees
+    const blockedRanges = blockedAngles.map(angle => ({
+        start: ((angle - clearance) % 360 + 360) % 360,
+        end: ((angle + clearance) % 360 + 360) % 360
+    }));
+    
+    // Find available angles
+    const candidateAngles = [];
+    for (let angle = 0; angle < 360; angle += 15) {
+        let isBlocked = false;
+        for (const range of blockedRanges) {
+            if (range.start <= range.end) {
+                if (angle >= range.start && angle <= range.end) {
+                    isBlocked = true;
+                    break;
+                }
+            } else {
+                if (angle >= range.start || angle <= range.end) {
+                    isBlocked = true;
+                    break;
+                }
+            }
+        }
+        if (!isBlocked) {
+            candidateAngles.push(angle);
+        }
+    }
+    
+    // Select angles for attributes
+    const selectedAngles = [];
+    const availableAngles = candidateAngles.length >= numAttrs 
+        ? candidateAngles 
+        : Array.from({ length: 24 }, (_, i) => i * 15);
+    
+    if (numAttrs <= availableAngles.length) {
+        const step = availableAngles.length / numAttrs;
+        for (let i = 0; i < numAttrs; i++) {
+            selectedAngles.push(availableAngles[Math.floor(i * step)]);
+        }
+    } else {
+        selectedAngles.push(...availableAngles);
+        while (selectedAngles.length < numAttrs) {
+            selectedAngles.push(90);
+        }
+    }
+    
+    // Position attributes
+    attrs.forEach((attr, i) => {
+        const angle = selectedAngles[i];
+        const angleRad = (angle * Math.PI) / 180;
+        const radius = baseRadius + (i % 2) * 0.15; // Slight variation
+        
+        const attrX = relPos.x + radius * Math.cos(angleRad);
+        const attrY = relPos.y + radius * Math.sin(angleRad);
+        
+        attrPositions[attr] = { x: attrX, y: attrY };
+    });
+    
+    return attrPositions;
 }
 
 // Distribute attributes smartly
@@ -710,6 +867,42 @@ function generateDOT() {
         dot += `    height=0.8,\n`;
         dot += `    pos="${relPosStr}"\n`;
         dot += `  ];\n`;
+        
+        // Render relationship attributes (for many-to-many)
+        if (rel.type === 'many-to-many' && rel.attributes && rel.attributes.length > 0) {
+            const relPos = { x: relX, y: relY };
+            const relAttrPositions = distributeRelationshipAttributes(
+                relId,
+                relPos,
+                rel.attributes,
+                positions,
+                rel.entity1,
+                rel.entity2
+            );
+            
+            rel.attributes.forEach(attr => {
+                const attrPos = relAttrPositions[attr];
+                const attrId = `${relId}_${attr}`.replace(/\s+/g, '_');
+                const attrPosStr = usePinning 
+                    ? `${attrPos.x},${attrPos.y}!` 
+                    : `${attrPos.x},${attrPos.y}`;
+                
+                dot += `  "${attrId}" [\n`;
+                dot += `    shape=ellipse,\n`;
+                dot += `    style=filled,\n`;
+                dot += `    fillcolor="white",\n`;
+                dot += `    fontcolor="black",\n`;
+                dot += `    fontname="Arial",\n`;
+                dot += `    fontsize=9,\n`;
+                dot += `    width=1.0,\n`;
+                dot += `    height=0.45,\n`;
+                dot += `    label="${attr}",\n`;
+                dot += `    pos="${attrPosStr}"\n`;
+                dot += `  ];\n`;
+                
+                dot += `  "${attrId}" -> "${relId}" [arrowhead=none, penwidth=0.5, style=dashed, color="#64748b"];\n`;
+            });
+        }
         
         const card = getCardinality(rel.type);
         
@@ -988,7 +1181,8 @@ async function loadERDForEdit(erdId) {
                 entity2: rel.entity2,
                 relation: rel.relation,
                 type: rel.type,
-                layout: rel.layout || 'LR'
+                layout: rel.layout || 'LR',
+                attributes: rel.attributes || [] // Load relationship attributes
             });
         });
         
@@ -1049,7 +1243,8 @@ async function saveERD() {
                 entity2: r.entity2,
                 relation: r.relation,
                 type: r.type,
-                layout: r.layout
+                layout: r.layout,
+                attributes: r.attributes || [] // Include relationship attributes
             }))
         };
 

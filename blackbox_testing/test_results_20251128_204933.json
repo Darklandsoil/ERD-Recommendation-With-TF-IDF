@@ -1,0 +1,409 @@
+{
+  "timestamp": "20251128_204933",
+  "total_tests": 50,
+  "passed": 50,
+  "failed": 0,
+  "success_rate": 100.0,
+  "results": [
+    {
+      "ID": "TC-AUTH-002",
+      "Test Name": "Register User Valid",
+      "Status": "PASS",
+      "Expected": "Status 200/201 or User exists",
+      "Actual": "Status 409 - User exists",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-003",
+      "Test Name": "Register Username Kosong",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-004",
+      "Test Name": "Register Email Invalid",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-006",
+      "Test Name": "Login User Valid",
+      "Status": "PASS",
+      "Expected": "Status 200 with token",
+      "Actual": "Status 200 - Token received",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-006b",
+      "Test Name": "Login Advisor Valid",
+      "Status": "PASS",
+      "Expected": "Status 200 with token",
+      "Actual": "Status 200 - Token received",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-007",
+      "Test Name": "Login Username Not Found",
+      "Status": "PASS",
+      "Expected": "Status 401/404",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-008",
+      "Test Name": "Login Wrong Password",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-009",
+      "Test Name": "Login Empty Fields",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-011",
+      "Test Name": "Access Without Token",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-012",
+      "Test Name": "Access Invalid Token",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-013",
+      "Test Name": "SQL Injection Prevention",
+      "Status": "PASS",
+      "Expected": "Status 401/404/400 - No bypass",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-USER-002",
+      "Test Name": "Search ERD Valid",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-USER-003",
+      "Test Name": "Search Empty Keyword",
+      "Status": "PASS",
+      "Expected": "Status 400/422 or 200",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-USER-004",
+      "Test Name": "XSS Prevention",
+      "Status": "PASS",
+      "Expected": "Input sanitized",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-USER-006",
+      "Test Name": "Create Request",
+      "Status": "PASS",
+      "Expected": "Status 200/201",
+      "Actual": "Status 201",
+      "Message": ""
+    },
+    {
+      "ID": "TC-USER-007",
+      "Test Name": "Request Empty Fields",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-USER-008",
+      "Test Name": "Get My Requests",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-002",
+      "Test Name": "Add ERD Valid",
+      "Status": "PASS",
+      "Expected": "Status 200/201",
+      "Actual": "Status 201",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-003",
+      "Test Name": "Add ERD Empty Name",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-005",
+      "Test Name": "Add ERD No Entities",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-010",
+      "Test Name": "Get My ERDs",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-015",
+      "Test Name": "Get Pending Requests",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-017",
+      "Test Name": "Get My Assigned Requests",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADV-020",
+      "Test Name": "User Access Advisor Endpoint",
+      "Status": "PASS",
+      "Expected": "Status 403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ERD-002",
+      "Test Name": "Get ERD Detail Invalid ID",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ERD-004",
+      "Test Name": "Update ERD Invalid ID",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ERD-007",
+      "Test Name": "Delete ERD Invalid ID",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-REQ-002",
+      "Test Name": "Cancel Non-existent Request",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-REQ-005",
+      "Test Name": "Assign Non-existent Request",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADD-001",
+      "Test Name": "Logout Valid Token",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADD-002",
+      "Test Name": "Logout No Token",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADD-003",
+      "Test Name": "List All ERDs",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADD-004",
+      "Test Name": "Get All ERDs",
+      "Status": "PASS",
+      "Expected": "Status 200",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-IMG-002",
+      "Test Name": "Generate ERD Image Invalid",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-IMG-004",
+      "Test Name": "Download Path Traversal",
+      "Status": "PASS",
+      "Expected": "Status 400/403/404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-001",
+      "Test Name": "Get Advisors No Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-002",
+      "Test Name": "Advisor Access Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-003",
+      "Test Name": "Create Advisor No Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-004",
+      "Test Name": "Update Advisor No Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-005",
+      "Test Name": "Delete Advisor No Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-006",
+      "Test Name": "Get Statistics No Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-007",
+      "Test Name": "Get Monitoring No Admin",
+      "Status": "PASS",
+      "Expected": "Status 401/403",
+      "Actual": "Status 403",
+      "Message": ""
+    },
+    {
+      "ID": "TC-ADM-008",
+      "Test Name": "Admin Dashboard No Token",
+      "Status": "PASS",
+      "Expected": "Status 200/302/401/403",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-001",
+      "Test Name": "Access API No Token",
+      "Status": "PASS",
+      "Expected": "Status 401 or 200 (if public)",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-002",
+      "Test Name": "Method Not Allowed",
+      "Status": "PASS",
+      "Expected": "Status 405",
+      "Actual": "Status 405",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-003",
+      "Test Name": "Invalid JSON",
+      "Status": "PASS",
+      "Expected": "Status 400",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-005",
+      "Test Name": "Resource Not Found",
+      "Status": "PASS",
+      "Expected": "Status 404",
+      "Actual": "Status 404",
+      "Message": ""
+    },
+    {
+      "ID": "TC-SEC-001",
+      "Test Name": "XSS Prevention",
+      "Status": "PASS",
+      "Expected": "Input sanitized/rejected",
+      "Actual": "All payloads handled",
+      "Message": ""
+    },
+    {
+      "ID": "TC-SEC-004",
+      "Test Name": "JWT Manipulation Prevention",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-SEC-007",
+      "Test Name": "Directory Traversal Prevention",
+      "Status": "PASS",
+      "Expected": "Status 400/403/404",
+      "Actual": "Status 404",
+      "Message": ""
+    }
+  ]
+}

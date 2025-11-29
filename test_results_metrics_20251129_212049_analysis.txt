@@ -1,0 +1,178 @@
+
+================================================================================
+CONFUSION MATRIX (Top-5 Recommendations)
+================================================================================
+
+                     Predicted Relevant  |  Predicted Not Relevant
+                     -------------------|------------------------
+Actual Relevant      TP =   52          |  FN =    0
+Actual Not Relevant  FP =  198          |  TN = 1550
+
+================================================================================
+
+Derived Metrics:
+  Accuracy:  0.8900
+  Precision: 0.2080
+  Recall:    1.0000
+  F1-Score:  0.3444
+================================================================================
+
+
+================================================================================
+FAILURE CASES ANALYSIS (Top-5)
+================================================================================
+
+FALSE NEGATIVES: 0 queries
+--------------------------------------------------------------------------------
+No false negatives - Perfect recall!
+
+
+FALSE POSITIVES: 50 queries
+--------------------------------------------------------------------------------
+
+1. Query 1: sistem mahasiswa dosen mata kuliah nilai semester
+   Wrong ERDs: sekolah, sistem_informasi_akademik_universitas, asuransi, erd_manajemen_sistem
+
+2. Query 2: siswa guru kelas mata pelajaran nilai rapor
+   Wrong ERDs: taman_kanak_kanak, gym, bimbingan_belajar, universitas
+
+3. Query 3: peminjaman buku anggota perpustakaan denda
+   Wrong ERDs: rental_mobil, koperasi, bank
+
+4. Query 4: peserta instruktur kursus materi sertifikat online
+   Wrong ERDs: manajemen_sekolah, kantor, sistem_informasi_akademik_universitas, perpustakaan
+
+5. Query 5: tutor siswa paket belajar jadwal bimbingan
+   Wrong ERDs: bioskop, ekspedisi, sekolah, universitas
+
+6. Query 6: anak taman kanak guru kegiatan orang tua
+   Wrong ERDs: sekolah, kantor, sistem_informasi_akademik_universitas, perpustakaan
+
+7. Query 7: pasien dokter perawat ruangan rekam medis obat
+   Wrong ERDs: laboratorium_klinik, bimbingan_belajar, poliklinik, apotek
+
+8. Query 8: obat supplier pelanggan resep penjualan apotek
+   Wrong ERDs: e_commerce, supermarket, rumah_sakit, toko_bangunan
+
+9. Query 9: pasien tes laboratorium hasil teknisi peralatan
+   Wrong ERDs: gym, poliklinik, rumah_sakit, service_center
+
+10. Query 10: pasien dokter poliklinik kunjungan diagnosa
+   Wrong ERDs: laboratorium_klinik, rumah_sakit, apotek, service_center
+
+================================================================================
+
+
+================================================================================
+PERFORMANCE BY QUERY DIFFICULTY
+================================================================================
+
+Queries with 1 relevant ERD(s): 48 queries
+  Average P@5: 0.2000
+  Average R@5: 1.0000
+  Average F1@5: 0.3333
+  Worst case: Query 1 (F1=0.333): sistem mahasiswa dosen mata kuliah nilai semester...
+
+Queries with 2 relevant ERD(s): 2 queries
+  Average P@5: 0.4000
+  Average R@5: 1.0000
+  Average F1@5: 0.5714
+  Worst case: Query 3 (F1=0.571): peminjaman buku anggota perpustakaan denda...
+
+================================================================================
+
+
+================================================================================
+BEST AND WORST PERFORMING QUERIES (Top-5)
+================================================================================
+
+TOP 5 BEST PERFORMING QUERIES:
+--------------------------------------------------------------------------------
+
+1. Query 3: peminjaman buku anggota perpustakaan denda
+   Description: Query tentang perpustakaan
+   P@5=0.400, R@5=1.000, F1@5=0.571
+   Relevant: perpustakaan, perpustakaan_daerah
+   Recommended: perpustakaan_daerah, perpustakaan, koperasi, bank, rental_mobil
+
+2. Query 24: buku anggota peminjaman denda kategori perpustakaan daerah
+   Description: Query tentang perpustakaan daerah
+   P@5=0.400, R@5=1.000, F1@5=0.571
+   Relevant: perpustakaan_daerah, perpustakaan
+   Recommended: perpustakaan_daerah, perpustakaan, koperasi, bank, rental_mobil
+
+3. Query 1: sistem mahasiswa dosen mata kuliah nilai semester
+   Description: Query tentang sistem universitas
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: universitas
+   Recommended: sistem_informasi_akademik_universitas, universitas, sekolah, erd_manajemen_sistem, asuransi
+
+4. Query 2: siswa guru kelas mata pelajaran nilai rapor
+   Description: Query tentang sistem sekolah
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: sekolah
+   Recommended: sekolah, bimbingan_belajar, taman_kanak_kanak, gym, universitas
+
+5. Query 4: peserta instruktur kursus materi sertifikat online
+   Description: Query tentang kursus online
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: kursus_online
+   Recommended: kursus_online, perpustakaan, kantor, sistem_informasi_akademik_universitas, manajemen_sekolah
+
+
+TOP 5 WORST PERFORMING QUERIES:
+--------------------------------------------------------------------------------
+
+1. Query 46: paket resi pengiriman alamat kurir tracking ekspedisi
+   Description: Query ekspedisi dengan tracking
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: ekspedisi
+   Recommended: ekspedisi, bimbingan_belajar, e_commerce, laboratorium_klinik, sistem_informasi_akademik_universitas
+
+2. Query 47: anggota simpanan wajib sukarela pinjaman lunak koperasi
+   Description: Query koperasi dengan jenis simpanan
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: koperasi
+   Recommended: koperasi, perpustakaan_daerah, perpustakaan, perpajakan, bank
+
+3. Query 48: polis asuransi jiwa kesehatan premi bulanan klaim
+   Description: Query asuransi dengan jenis polis
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: asuransi
+   Recommended: asuransi, perpustakaan, kantor, sistem_informasi_akademik_universitas, manajemen_sekolah
+
+4. Query 49: pajak spt tahunan npwp wajib pajak pelaporan
+   Description: Query perpajakan dengan SPT
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: perpajakan
+   Recommended: perpajakan, perpustakaan, kantor, sistem_informasi_akademik_universitas, manajemen_sekolah
+
+5. Query 50: ktp kk nik penduduk rt rw surat keterangan
+   Description: Query kelurahan dengan administrasi
+   P@5=0.200, R@5=1.000, F1@5=0.333
+   Relevant: kelurahan
+   Recommended: kelurahan, ekspedisi, bank, laboratorium_klinik, perpustakaan
+
+================================================================================
+
+================================================================================
+SUMMARY STATISTICS
+================================================================================
+
+Total Queries: 50
+Timestamp: 2025-11-29T21:20:49.319623
+K Values: [5, 10]
+
+Average Metrics:
+  MAP: 0.9667
+  MRR: 0.9600
+  average_precision: 0.9667
+  f1@10: 0.1915
+  f1@5: 0.3429
+  precision@10: 0.1060
+  precision@5: 0.2080
+  recall@10: 1.0200
+  recall@5: 1.0000
+  reciprocal_rank: 0.9600
+
+================================================================================

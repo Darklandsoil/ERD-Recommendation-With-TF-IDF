@@ -1,0 +1,1575 @@
+{
+  "timestamp": "2025-11-29T21:20:49.319623",
+  "total_queries": 50,
+  "k_values": [
+    5,
+    10
+  ],
+  "min_similarity": 0.0,
+  "average_metrics": {
+    "precision@5": 0.2079999999999999,
+    "recall@5": 1.0,
+    "f1@5": 0.34285714285714297,
+    "precision@10": 0.10599999999999994,
+    "recall@10": 1.02,
+    "f1@10": 0.19151515151515142,
+    "average_precision": 0.9666666666666667,
+    "reciprocal_rank": 0.96,
+    "MAP": 0.9666666666666667,
+    "MRR": 0.96
+  },
+  "query_results": [
+    {
+      "query_id": 1,
+      "query": "sistem mahasiswa dosen mata kuliah nilai semester",
+      "description": "Query tentang sistem universitas",
+      "relevant_erds": [
+        "universitas"
+      ],
+      "recommended_erds": [
+        "sistem_informasi_akademik_universitas",
+        "universitas",
+        "sekolah",
+        "erd_manajemen_sistem",
+        "asuransi",
+        "perpustakaan",
+        "kantor",
+        "manajemen_sekolah",
+        "rumah_sakit",
+        "poliklinik"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 0.5,
+        "reciprocal_rank": 0.5
+      }
+    },
+    {
+      "query_id": 2,
+      "query": "siswa guru kelas mata pelajaran nilai rapor",
+      "description": "Query tentang sistem sekolah",
+      "relevant_erds": [
+        "sekolah"
+      ],
+      "recommended_erds": [
+        "sekolah",
+        "bimbingan_belajar",
+        "taman_kanak_kanak",
+        "gym",
+        "universitas",
+        "sistem_informasi_akademik_universitas",
+        "bandara",
+        "asuransi",
+        "perpustakaan",
+        "kantor"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 3,
+      "query": "peminjaman buku anggota perpustakaan denda",
+      "description": "Query tentang perpustakaan",
+      "relevant_erds": [
+        "perpustakaan",
+        "perpustakaan_daerah"
+      ],
+      "recommended_erds": [
+        "perpustakaan_daerah",
+        "perpustakaan",
+        "koperasi",
+        "bank",
+        "rental_mobil",
+        "perpajakan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.4,
+        "recall@5": 1.0,
+        "f1@5": 0.5714285714285715,
+        "precision@10": 0.2,
+        "recall@10": 1.0,
+        "f1@10": 0.33333333333333337,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 4,
+      "query": "peserta instruktur kursus materi sertifikat online",
+      "description": "Query tentang kursus online",
+      "relevant_erds": [
+        "kursus_online"
+      ],
+      "recommended_erds": [
+        "kursus_online",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah",
+        "universitas"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 5,
+      "query": "tutor siswa paket belajar jadwal bimbingan",
+      "description": "Query tentang bimbingan belajar",
+      "relevant_erds": [
+        "bimbingan_belajar"
+      ],
+      "recommended_erds": [
+        "bimbingan_belajar",
+        "ekspedisi",
+        "sekolah",
+        "bioskop",
+        "universitas",
+        "rumah_sakit",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 6,
+      "query": "anak taman kanak guru kegiatan orang tua",
+      "description": "Query tentang TK",
+      "relevant_erds": [
+        "taman_kanak_kanak"
+      ],
+      "recommended_erds": [
+        "taman_kanak_kanak",
+        "sekolah",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "universitas"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 7,
+      "query": "pasien dokter perawat ruangan rekam medis obat",
+      "description": "Query tentang rumah sakit",
+      "relevant_erds": [
+        "rumah_sakit"
+      ],
+      "recommended_erds": [
+        "rumah_sakit",
+        "apotek",
+        "poliklinik",
+        "laboratorium_klinik",
+        "bimbingan_belajar",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 8,
+      "query": "obat supplier pelanggan resep penjualan apotek",
+      "description": "Query tentang apotek",
+      "relevant_erds": [
+        "apotek"
+      ],
+      "recommended_erds": [
+        "apotek",
+        "toko_bangunan",
+        "supermarket",
+        "rumah_sakit",
+        "e_commerce",
+        "poliklinik",
+        "service_center",
+        "salon",
+        "laundry",
+        "rental_mobil"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 9,
+      "query": "pasien tes laboratorium hasil teknisi peralatan",
+      "description": "Query tentang laboratorium klinik",
+      "relevant_erds": [
+        "laboratorium_klinik"
+      ],
+      "recommended_erds": [
+        "laboratorium_klinik",
+        "service_center",
+        "rumah_sakit",
+        "gym",
+        "poliklinik",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 10,
+      "query": "pasien dokter poliklinik kunjungan diagnosa",
+      "description": "Query tentang poliklinik",
+      "relevant_erds": [
+        "poliklinik"
+      ],
+      "recommended_erds": [
+        "rumah_sakit",
+        "poliklinik",
+        "laboratorium_klinik",
+        "service_center",
+        "apotek",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 0.5,
+        "reciprocal_rank": 0.5
+      }
+    },
+    {
+      "query_id": 11,
+      "query": "produk pelanggan keranjang transaksi pengiriman online",
+      "description": "Query tentang e-commerce",
+      "relevant_erds": [
+        "e_commerce"
+      ],
+      "recommended_erds": [
+        "e_commerce",
+        "laundry",
+        "salon",
+        "pabrik",
+        "real_estate",
+        "poliklinik",
+        "supermarket",
+        "apotek",
+        "toko_bangunan",
+        "ekspedisi"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 12,
+      "query": "barang kasir supplier member transaksi supermarket",
+      "description": "Query tentang supermarket",
+      "relevant_erds": [
+        "supermarket"
+      ],
+      "recommended_erds": [
+        "supermarket",
+        "gym",
+        "laundry",
+        "toko_bangunan",
+        "real_estate",
+        "e_commerce",
+        "apotek",
+        "poliklinik",
+        "bank",
+        "perpustakaan"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 13,
+      "query": "menu pelanggan meja pegawai pesanan restoran bahan baku",
+      "description": "Query tentang restoran",
+      "relevant_erds": [
+        "restoran"
+      ],
+      "recommended_erds": [
+        "restoran",
+        "pabrik",
+        "kantor",
+        "apotek",
+        "e_commerce",
+        "toko_bangunan",
+        "service_center",
+        "salon",
+        "laundry",
+        "rental_mobil"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 14,
+      "query": "kamar tamu reservasi hotel pembayaran check in",
+      "description": "Query tentang hotel",
+      "relevant_erds": [
+        "hotel"
+      ],
+      "recommended_erds": [
+        "hotel",
+        "kos_kosan",
+        "perpajakan",
+        "bimbingan_belajar",
+        "rental_mobil",
+        "koperasi",
+        "perpustakaan_daerah",
+        "apotek",
+        "e_commerce",
+        "real_estate"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 15,
+      "query": "pelanggan pakaian layanan laundry transaksi status cucian",
+      "description": "Query tentang laundry",
+      "relevant_erds": [
+        "laundry"
+      ],
+      "recommended_erds": [
+        "laundry",
+        "salon",
+        "e_commerce",
+        "real_estate",
+        "hotel",
+        "toko_bangunan",
+        "poliklinik",
+        "supermarket",
+        "apotek",
+        "service_center"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 16,
+      "query": "kendaraan booking rental mobil pengembalian pembayaran",
+      "description": "Query tentang rental mobil",
+      "relevant_erds": [
+        "rental_mobil"
+      ],
+      "recommended_erds": [
+        "rental_mobil",
+        "perpustakaan",
+        "perpajakan",
+        "kos_kosan",
+        "bimbingan_belajar",
+        "perpustakaan_daerah",
+        "hotel",
+        "koperasi",
+        "apotek",
+        "e_commerce"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 17,
+      "query": "penerbangan penumpang tiket maskapai gate bandara",
+      "description": "Query tentang bandara",
+      "relevant_erds": [
+        "bandara"
+      ],
+      "recommended_erds": [
+        "bandara",
+        "bioskop",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 18,
+      "query": "paket pengirim penerima tracking kurir ekspedisi",
+      "description": "Query tentang ekspedisi",
+      "relevant_erds": [
+        "ekspedisi"
+      ],
+      "recommended_erds": [
+        "ekspedisi",
+        "bimbingan_belajar",
+        "e_commerce",
+        "laboratorium_klinik",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 19,
+      "query": "nasabah rekening transaksi pinjaman kartu kredit bank",
+      "description": "Query tentang bank",
+      "relevant_erds": [
+        "bank"
+      ],
+      "recommended_erds": [
+        "bank",
+        "perpustakaan_daerah",
+        "laundry",
+        "perpustakaan",
+        "koperasi",
+        "real_estate",
+        "e_commerce",
+        "asuransi",
+        "poliklinik",
+        "supermarket"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 20,
+      "query": "anggota simpanan pinjaman angsuran dividen koperasi",
+      "description": "Query tentang koperasi",
+      "relevant_erds": [
+        "koperasi"
+      ],
+      "recommended_erds": [
+        "koperasi",
+        "perpustakaan_daerah",
+        "perpustakaan",
+        "bank",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 21,
+      "query": "nasabah polis premi klaim agen asuransi",
+      "description": "Query tentang asuransi",
+      "relevant_erds": [
+        "asuransi"
+      ],
+      "recommended_erds": [
+        "asuransi",
+        "bank",
+        "ekspedisi",
+        "real_estate",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 22,
+      "query": "wajib pajak npwp pembayaran pelaporan tunggakan",
+      "description": "Query tentang perpajakan",
+      "relevant_erds": [
+        "perpajakan"
+      ],
+      "recommended_erds": [
+        "perpajakan",
+        "kos_kosan",
+        "bimbingan_belajar",
+        "rental_mobil",
+        "hotel",
+        "koperasi",
+        "perpustakaan_daerah",
+        "apotek",
+        "e_commerce",
+        "real_estate"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 23,
+      "query": "penduduk nik ktp kartu keluarga surat keterangan kelurahan",
+      "description": "Query tentang kelurahan",
+      "relevant_erds": [
+        "kelurahan"
+      ],
+      "recommended_erds": [
+        "kelurahan",
+        "bank",
+        "ekspedisi",
+        "laboratorium_klinik",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 24,
+      "query": "buku anggota peminjaman denda kategori perpustakaan daerah",
+      "description": "Query tentang perpustakaan daerah",
+      "relevant_erds": [
+        "perpustakaan_daerah",
+        "perpustakaan"
+      ],
+      "recommended_erds": [
+        "perpustakaan_daerah",
+        "perpustakaan",
+        "koperasi",
+        "bank",
+        "rental_mobil",
+        "perpajakan",
+        "toko_bangunan",
+        "gym",
+        "pabrik",
+        "apotek"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.4,
+        "recall@5": 1.0,
+        "f1@5": 0.5714285714285715,
+        "precision@10": 0.2,
+        "recall@10": 1.0,
+        "f1@10": 0.33333333333333337,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 25,
+      "query": "properti pembeli agen transaksi cicilan real estate",
+      "description": "Query tentang real estate",
+      "relevant_erds": [
+        "real_estate"
+      ],
+      "recommended_erds": [
+        "real_estate",
+        "laundry",
+        "ekspedisi",
+        "e_commerce",
+        "poliklinik",
+        "supermarket",
+        "asuransi",
+        "bank",
+        "perpustakaan",
+        "kantor"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 26,
+      "query": "kamar penyewa pembayaran fasilitas kos kosan",
+      "description": "Query tentang kos-kosan",
+      "relevant_erds": [
+        "kos_kosan"
+      ],
+      "recommended_erds": [
+        "kos_kosan",
+        "hotel",
+        "rental_mobil",
+        "perpajakan",
+        "bimbingan_belajar",
+        "koperasi",
+        "perpustakaan_daerah",
+        "apotek",
+        "e_commerce",
+        "real_estate"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 27,
+      "query": "film studio jadwal tayang tiket bioskop pelanggan",
+      "description": "Query tentang bioskop",
+      "relevant_erds": [
+        "bioskop"
+      ],
+      "recommended_erds": [
+        "bioskop",
+        "bandara",
+        "bimbingan_belajar",
+        "apotek",
+        "e_commerce",
+        "toko_bangunan",
+        "service_center",
+        "salon",
+        "laundry",
+        "rental_mobil"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 28,
+      "query": "member trainer kelas peralatan membership gym fitness",
+      "description": "Query tentang gym",
+      "relevant_erds": [
+        "gym"
+      ],
+      "recommended_erds": [
+        "gym",
+        "supermarket",
+        "sekolah",
+        "taman_kanak_kanak",
+        "laboratorium_klinik",
+        "bandara",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 29,
+      "query": "produk bahan baku produksi pegawai mesin pabrik manufaktur",
+      "description": "Query tentang pabrik",
+      "relevant_erds": [
+        "pabrik"
+      ],
+      "recommended_erds": [
+        "pabrik",
+        "restoran",
+        "e_commerce",
+        "kantor",
+        "salon",
+        "perpustakaan",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 30,
+      "query": "material supplier pelanggan penjualan proyek toko bangunan",
+      "description": "Query tentang toko bangunan",
+      "relevant_erds": [
+        "toko_bangunan"
+      ],
+      "recommended_erds": [
+        "toko_bangunan",
+        "apotek",
+        "supermarket",
+        "e_commerce",
+        "service_center",
+        "salon",
+        "laundry",
+        "rental_mobil",
+        "restoran",
+        "bioskop"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 31,
+      "query": "pelanggan perangkat teknisi perbaikan sparepart service center",
+      "description": "Query tentang service center",
+      "relevant_erds": [
+        "service_center"
+      ],
+      "recommended_erds": [
+        "service_center",
+        "laboratorium_klinik",
+        "apotek",
+        "e_commerce",
+        "toko_bangunan",
+        "salon",
+        "laundry",
+        "rental_mobil",
+        "restoran",
+        "bioskop"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 32,
+      "query": "pelanggan layanan stylist appointment produk salon barbershop",
+      "description": "Query tentang salon",
+      "relevant_erds": [
+        "salon"
+      ],
+      "recommended_erds": [
+        "salon",
+        "e_commerce",
+        "laundry",
+        "pabrik",
+        "hotel",
+        "apotek",
+        "toko_bangunan",
+        "service_center",
+        "rental_mobil",
+        "restoran"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 33,
+      "query": "pegawai departemen proyek tugas kantor",
+      "description": "Query tentang kantor",
+      "relevant_erds": [
+        "kantor"
+      ],
+      "recommended_erds": [
+        "perpustakaan",
+        "kantor",
+        "toko_bangunan",
+        "pabrik",
+        "restoran",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 0.5,
+        "reciprocal_rank": 0.5
+      }
+    },
+    {
+      "query_id": 34,
+      "query": "mahasiswa nim jurusan krs dosen mata kuliah kampus",
+      "description": "Query spesifik universitas dengan detail",
+      "relevant_erds": [
+        "universitas"
+      ],
+      "recommended_erds": [
+        "universitas",
+        "sistem_informasi_akademik_universitas",
+        "sekolah",
+        "perpustakaan",
+        "kantor",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "kursus_online"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 35,
+      "query": "pasien rawat inap dokter spesialis kamar rumah sakit",
+      "description": "Query spesifik rumah sakit",
+      "relevant_erds": [
+        "rumah_sakit"
+      ],
+      "recommended_erds": [
+        "rumah_sakit",
+        "poliklinik",
+        "kos_kosan",
+        "laboratorium_klinik",
+        "hotel",
+        "rumah_sakit",
+        "apotek",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.2,
+        "recall@10": 2.0,
+        "f1@10": 0.36363636363636365,
+        "average_precision": 1.3333333333333333,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 36,
+      "query": "transaksi pembayaran online keranjang belanja produk",
+      "description": "Query e-commerce dengan pembayaran",
+      "relevant_erds": [
+        "e_commerce"
+      ],
+      "recommended_erds": [
+        "e_commerce",
+        "pabrik",
+        "laundry",
+        "real_estate",
+        "salon",
+        "poliklinik",
+        "supermarket",
+        "bank",
+        "perpajakan",
+        "kos_kosan"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 37,
+      "query": "pemesanan kamar hotel check in check out tamu",
+      "description": "Query hotel dengan reservasi",
+      "relevant_erds": [
+        "hotel"
+      ],
+      "recommended_erds": [
+        "hotel",
+        "kos_kosan",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 38,
+      "query": "penerbangan tiket pesawat boarding pass maskapai",
+      "description": "Query bandara dengan penerbangan",
+      "relevant_erds": [
+        "bandara"
+      ],
+      "recommended_erds": [
+        "bandara",
+        "bioskop",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 39,
+      "query": "rekening tabungan deposito bunga nasabah perbankan",
+      "description": "Query bank dengan produk perbankan",
+      "relevant_erds": [
+        "bank"
+      ],
+      "recommended_erds": [
+        "bank",
+        "asuransi",
+        "koperasi",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 40,
+      "query": "siswa nis guru wali kelas nilai ujian sekolah",
+      "description": "Query sekolah dengan detail siswa",
+      "relevant_erds": [
+        "sekolah"
+      ],
+      "recommended_erds": [
+        "sekolah",
+        "taman_kanak_kanak",
+        "manajemen_sekolah",
+        "bimbingan_belajar",
+        "gym",
+        "sistem_informasi_akademik_universitas",
+        "bandara",
+        "universitas",
+        "asuransi",
+        "perpustakaan"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 41,
+      "query": "obat resep dokter stok harga apotek farmasi",
+      "description": "Query apotek dengan detail obat",
+      "relevant_erds": [
+        "apotek"
+      ],
+      "recommended_erds": [
+        "apotek",
+        "rumah_sakit",
+        "poliklinik",
+        "laboratorium_klinik",
+        "pabrik",
+        "restoran",
+        "salon",
+        "e_commerce",
+        "service_center",
+        "toko_bangunan"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 42,
+      "query": "tes darah urine laboratorium hasil pemeriksaan",
+      "description": "Query laboratorium dengan jenis tes",
+      "relevant_erds": [
+        "laboratorium_klinik"
+      ],
+      "recommended_erds": [
+        "laboratorium_klinik",
+        "rumah_sakit",
+        "poliklinik",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 43,
+      "query": "barang stok kasir struk pembayaran minimarket",
+      "description": "Query supermarket dengan transaksi",
+      "relevant_erds": [
+        "supermarket"
+      ],
+      "recommended_erds": [
+        "supermarket",
+        "perpajakan",
+        "kos_kosan",
+        "bimbingan_belajar",
+        "rental_mobil",
+        "hotel",
+        "perpustakaan_daerah",
+        "apotek",
+        "e_commerce",
+        "koperasi"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 44,
+      "query": "menu makanan pesanan meja waiters dapur restoran",
+      "description": "Query restoran dengan detail operasional",
+      "relevant_erds": [
+        "restoran"
+      ],
+      "recommended_erds": [
+        "restoran",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah",
+        "universitas"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 45,
+      "query": "mobil sewa rental harian mingguan sopir",
+      "description": "Query rental mobil dengan detail sewa",
+      "relevant_erds": [
+        "rental_mobil"
+      ],
+      "recommended_erds": [
+        "kos_kosan",
+        "rental_mobil",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 0.5,
+        "reciprocal_rank": 0.5
+      }
+    },
+    {
+      "query_id": 46,
+      "query": "paket resi pengiriman alamat kurir tracking ekspedisi",
+      "description": "Query ekspedisi dengan tracking",
+      "relevant_erds": [
+        "ekspedisi"
+      ],
+      "recommended_erds": [
+        "ekspedisi",
+        "bimbingan_belajar",
+        "e_commerce",
+        "laboratorium_klinik",
+        "sistem_informasi_akademik_universitas",
+        "toko_bangunan",
+        "taman_kanak_kanak",
+        "apotek",
+        "real_estate",
+        "kelurahan"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 47,
+      "query": "anggota simpanan wajib sukarela pinjaman lunak koperasi",
+      "description": "Query koperasi dengan jenis simpanan",
+      "relevant_erds": [
+        "koperasi"
+      ],
+      "recommended_erds": [
+        "koperasi",
+        "perpustakaan_daerah",
+        "perpustakaan",
+        "perpajakan",
+        "bank",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 48,
+      "query": "polis asuransi jiwa kesehatan premi bulanan klaim",
+      "description": "Query asuransi dengan jenis polis",
+      "relevant_erds": [
+        "asuransi"
+      ],
+      "recommended_erds": [
+        "asuransi",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah",
+        "universitas"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 49,
+      "query": "pajak spt tahunan npwp wajib pajak pelaporan",
+      "description": "Query perpajakan dengan SPT",
+      "relevant_erds": [
+        "perpajakan"
+      ],
+      "recommended_erds": [
+        "perpajakan",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit",
+        "poliklinik",
+        "sekolah",
+        "universitas"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    },
+    {
+      "query_id": 50,
+      "query": "ktp kk nik penduduk rt rw surat keterangan",
+      "description": "Query kelurahan dengan administrasi",
+      "relevant_erds": [
+        "kelurahan"
+      ],
+      "recommended_erds": [
+        "kelurahan",
+        "ekspedisi",
+        "bank",
+        "laboratorium_klinik",
+        "perpustakaan",
+        "kantor",
+        "sistem_informasi_akademik_universitas",
+        "manajemen_sekolah",
+        "erd_manajemen_sistem",
+        "rumah_sakit"
+      ],
+      "total_recommendations": 10,
+      "metrics": {
+        "precision@5": 0.2,
+        "recall@5": 1.0,
+        "f1@5": 0.33333333333333337,
+        "precision@10": 0.1,
+        "recall@10": 1.0,
+        "f1@10": 0.18181818181818182,
+        "average_precision": 1.0,
+        "reciprocal_rank": 1.0
+      }
+    }
+  ]
+}

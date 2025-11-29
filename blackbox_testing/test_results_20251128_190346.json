@@ -1,0 +1,145 @@
+{
+  "timestamp": "20251128_190346",
+  "total_tests": 17,
+  "passed": 13,
+  "failed": 4,
+  "success_rate": 76.47058823529412,
+  "results": [
+    {
+      "ID": "TC-AUTH-002",
+      "Test Name": "Register User Valid",
+      "Status": "FAIL",
+      "Expected": "Status 200/201",
+      "Actual": "Status 400",
+      "Message": "{'error': 'Fullname, Username, email, dan password diperlukan'}"
+    },
+    {
+      "ID": "TC-AUTH-003",
+      "Test Name": "Register Username Kosong",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-004",
+      "Test Name": "Register Email Invalid",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-006",
+      "Test Name": "Login User Valid",
+      "Status": "FAIL",
+      "Expected": "Status 200 with token",
+      "Actual": "Status 401",
+      "Message": "{'error': 'Username atau password salah'}"
+    },
+    {
+      "ID": "TC-AUTH-006b",
+      "Test Name": "Login Advisor Valid",
+      "Status": "FAIL",
+      "Expected": "Status 200 with token",
+      "Actual": "Status 401",
+      "Message": "{'error': 'Username atau password salah'}"
+    },
+    {
+      "ID": "TC-AUTH-007",
+      "Test Name": "Login Username Not Found",
+      "Status": "PASS",
+      "Expected": "Status 401/404",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-008",
+      "Test Name": "Login Wrong Password",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-009",
+      "Test Name": "Login Empty Fields",
+      "Status": "PASS",
+      "Expected": "Status 400/422",
+      "Actual": "Status 400",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-011",
+      "Test Name": "Access Without Token",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-012",
+      "Test Name": "Access Invalid Token",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-AUTH-013",
+      "Test Name": "SQL Injection Prevention",
+      "Status": "PASS",
+      "Expected": "Status 401/404/400 - No bypass",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-001",
+      "Test Name": "Access API No Token",
+      "Status": "PASS",
+      "Expected": "Status 401 or 200 (if public)",
+      "Actual": "Status 200",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-002",
+      "Test Name": "Method Not Allowed",
+      "Status": "PASS",
+      "Expected": "Status 405",
+      "Actual": "Status 405",
+      "Message": ""
+    },
+    {
+      "ID": "TC-API-005",
+      "Test Name": "Resource Not Found",
+      "Status": "FAIL",
+      "Expected": "Status 404",
+      "Actual": "Status 401",
+      "Message": "{'error': 'Token tidak ditemukan', 'message': 'Akses ditolak. Silakan login terlebih dahulu'}"
+    },
+    {
+      "ID": "TC-SEC-001",
+      "Test Name": "XSS Prevention",
+      "Status": "PASS",
+      "Expected": "Input sanitized/rejected",
+      "Actual": "All payloads handled",
+      "Message": ""
+    },
+    {
+      "ID": "TC-SEC-004",
+      "Test Name": "JWT Manipulation Prevention",
+      "Status": "PASS",
+      "Expected": "Status 401",
+      "Actual": "Status 401",
+      "Message": ""
+    },
+    {
+      "ID": "TC-SEC-007",
+      "Test Name": "Directory Traversal Prevention",
+      "Status": "PASS",
+      "Expected": "Status 400/403/404",
+      "Actual": "Status 404",
+      "Message": ""
+    }
+  ]
+}

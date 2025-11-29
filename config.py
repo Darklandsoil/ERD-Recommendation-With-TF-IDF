@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 
 class Config:
@@ -9,7 +10,7 @@ class Config:
     
     # JWT Configuration
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-secret-key-change-in-production'
-    JWT_ACCESS_TOKEN_EXPIRES = False  # Tidak expire untuk development
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)  # Tidak expire untuk development
     
     # Collections
     ERD_COLLECTION = "erd"

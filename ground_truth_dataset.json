@@ -1,0 +1,352 @@
+[
+  {
+    "query_id": 1,
+    "query": "sistem mahasiswa dosen mata kuliah nilai semester",
+    "description": "Query tentang sistem universitas",
+    "relevant_erds": ["universitas"],
+    "irrelevant_erds": ["sekolah", "kursus_online", "bank"]
+  },
+  {
+    "query_id": 2,
+    "query": "siswa guru kelas mata pelajaran nilai rapor",
+    "description": "Query tentang sistem sekolah",
+    "relevant_erds": ["sekolah"],
+    "irrelevant_erds": ["universitas", "taman_kanak_kanak", "bimbingan_belajar"]
+  },
+  {
+    "query_id": 3,
+    "query": "peminjaman buku anggota perpustakaan denda",
+    "description": "Query tentang perpustakaan",
+    "relevant_erds": ["perpustakaan", "perpustakaan_daerah"],
+    "irrelevant_erds": ["sekolah", "bank", "rumah_sakit"]
+  },
+  {
+    "query_id": 4,
+    "query": "peserta instruktur kursus materi sertifikat online",
+    "description": "Query tentang kursus online",
+    "relevant_erds": ["kursus_online"],
+    "irrelevant_erds": ["universitas", "bimbingan_belajar", "sekolah"]
+  },
+  {
+    "query_id": 5,
+    "query": "tutor siswa paket belajar jadwal bimbingan",
+    "description": "Query tentang bimbingan belajar",
+    "relevant_erds": ["bimbingan_belajar"],
+    "irrelevant_erds": ["kursus_online", "sekolah", "universitas"]
+  },
+  {
+    "query_id": 6,
+    "query": "anak taman kanak guru kegiatan orang tua",
+    "description": "Query tentang TK",
+    "relevant_erds": ["taman_kanak_kanak"],
+    "irrelevant_erds": ["sekolah", "bimbingan_belajar", "poliklinik"]
+  },
+  {
+    "query_id": 7,
+    "query": "pasien dokter perawat ruangan rekam medis obat",
+    "description": "Query tentang rumah sakit",
+    "relevant_erds": ["rumah_sakit"],
+    "irrelevant_erds": ["poliklinik", "apotek", "laboratorium_klinik"]
+  },
+  {
+    "query_id": 8,
+    "query": "obat supplier pelanggan resep penjualan apotek",
+    "description": "Query tentang apotek",
+    "relevant_erds": ["apotek"],
+    "irrelevant_erds": ["rumah_sakit", "poliklinik", "toko_bangunan"]
+  },
+  {
+    "query_id": 9,
+    "query": "pasien tes laboratorium hasil teknisi peralatan",
+    "description": "Query tentang laboratorium klinik",
+    "relevant_erds": ["laboratorium_klinik"],
+    "irrelevant_erds": ["rumah_sakit", "apotek", "service_center"]
+  },
+  {
+    "query_id": 10,
+    "query": "pasien dokter poliklinik kunjungan diagnosa",
+    "description": "Query tentang poliklinik",
+    "relevant_erds": ["poliklinik"],
+    "irrelevant_erds": ["rumah_sakit", "apotek", "laboratorium_klinik"]
+  },
+  {
+    "query_id": 11,
+    "query": "produk pelanggan keranjang transaksi pengiriman online",
+    "description": "Query tentang e-commerce",
+    "relevant_erds": ["e_commerce"],
+    "irrelevant_erds": ["supermarket", "toko_bangunan", "apotek"]
+  },
+  {
+    "query_id": 12,
+    "query": "barang kasir supplier member transaksi supermarket",
+    "description": "Query tentang supermarket",
+    "relevant_erds": ["supermarket"],
+    "irrelevant_erds": ["e_commerce", "toko_bangunan", "restoran"]
+  },
+  {
+    "query_id": 13,
+    "query": "menu pelanggan meja pegawai pesanan restoran bahan baku",
+    "description": "Query tentang restoran",
+    "relevant_erds": ["restoran"],
+    "irrelevant_erds": ["hotel", "salon", "supermarket"]
+  },
+  {
+    "query_id": 14,
+    "query": "kamar tamu reservasi hotel pembayaran check in",
+    "description": "Query tentang hotel",
+    "relevant_erds": ["hotel"],
+    "irrelevant_erds": ["kos_kosan", "restoran", "rental_mobil"]
+  },
+  {
+    "query_id": 15,
+    "query": "pelanggan pakaian layanan laundry transaksi status cucian",
+    "description": "Query tentang laundry",
+    "relevant_erds": ["laundry"],
+    "irrelevant_erds": ["salon", "hotel", "service_center"]
+  },
+  {
+    "query_id": 16,
+    "query": "kendaraan booking rental mobil pengembalian pembayaran",
+    "description": "Query tentang rental mobil",
+    "relevant_erds": ["rental_mobil"],
+    "irrelevant_erds": ["bandara", "ekspedisi", "hotel"]
+  },
+  {
+    "query_id": 17,
+    "query": "penerbangan penumpang tiket maskapai gate bandara",
+    "description": "Query tentang bandara",
+    "relevant_erds": ["bandara"],
+    "irrelevant_erds": ["rental_mobil", "ekspedisi", "hotel"]
+  },
+  {
+    "query_id": 18,
+    "query": "paket pengirim penerima tracking kurir ekspedisi",
+    "description": "Query tentang ekspedisi",
+    "relevant_erds": ["ekspedisi"],
+    "irrelevant_erds": ["kantor", "bandara", "rental_mobil"]
+  },
+  {
+    "query_id": 19,
+    "query": "nasabah rekening transaksi pinjaman kartu kredit bank",
+    "description": "Query tentang bank",
+    "relevant_erds": ["bank"],
+    "irrelevant_erds": ["koperasi", "asuransi", "perpajakan"]
+  },
+  {
+    "query_id": 20,
+    "query": "anggota simpanan pinjaman angsuran dividen koperasi",
+    "description": "Query tentang koperasi",
+    "relevant_erds": ["koperasi"],
+    "irrelevant_erds": ["bank", "asuransi", "perpajakan"]
+  },
+  {
+    "query_id": 21,
+    "query": "nasabah polis premi klaim agen asuransi",
+    "description": "Query tentang asuransi",
+    "relevant_erds": ["asuransi"],
+    "irrelevant_erds": ["bank", "koperasi", "real_estate"]
+  },
+  {
+    "query_id": 22,
+    "query": "wajib pajak npwp pembayaran pelaporan tunggakan",
+    "description": "Query tentang perpajakan",
+    "relevant_erds": ["perpajakan"],
+    "irrelevant_erds": ["bank", "koperasi", "kantor"]
+  },
+  {
+    "query_id": 23,
+    "query": "penduduk nik ktp kartu keluarga surat keterangan kelurahan",
+    "description": "Query tentang kelurahan",
+    "relevant_erds": ["kelurahan"],
+    "irrelevant_erds": ["perpajakan", "kantor", "bank"]
+  },
+  {
+    "query_id": 24,
+    "query": "buku anggota peminjaman denda kategori perpustakaan daerah",
+    "description": "Query tentang perpustakaan daerah",
+    "relevant_erds": ["perpustakaan_daerah", "perpustakaan"],
+    "irrelevant_erds": ["sekolah", "universitas", "toko_bangunan"]
+  },
+  {
+    "query_id": 25,
+    "query": "properti pembeli agen transaksi cicilan real estate",
+    "description": "Query tentang real estate",
+    "relevant_erds": ["real_estate"],
+    "irrelevant_erds": ["kos_kosan", "hotel", "bank"]
+  },
+  {
+    "query_id": 26,
+    "query": "kamar penyewa pembayaran fasilitas kos kosan",
+    "description": "Query tentang kos-kosan",
+    "relevant_erds": ["kos_kosan"],
+    "irrelevant_erds": ["hotel", "real_estate", "laundry"]
+  },
+  {
+    "query_id": 27,
+    "query": "film studio jadwal tayang tiket bioskop pelanggan",
+    "description": "Query tentang bioskop",
+    "relevant_erds": ["bioskop"],
+    "irrelevant_erds": ["hotel", "restoran", "salon"]
+  },
+  {
+    "query_id": 28,
+    "query": "member trainer kelas peralatan membership gym fitness",
+    "description": "Query tentang gym",
+    "relevant_erds": ["gym"],
+    "irrelevant_erds": ["salon", "hotel", "bioskop"]
+  },
+  {
+    "query_id": 29,
+    "query": "produk bahan baku produksi pegawai mesin pabrik manufaktur",
+    "description": "Query tentang pabrik",
+    "relevant_erds": ["pabrik"],
+    "irrelevant_erds": ["toko_bangunan", "supermarket", "kantor"]
+  },
+  {
+    "query_id": 30,
+    "query": "material supplier pelanggan penjualan proyek toko bangunan",
+    "description": "Query tentang toko bangunan",
+    "relevant_erds": ["toko_bangunan"],
+    "irrelevant_erds": ["pabrik", "supermarket", "real_estate"]
+  },
+  {
+    "query_id": 31,
+    "query": "pelanggan perangkat teknisi perbaikan sparepart service center",
+    "description": "Query tentang service center",
+    "relevant_erds": ["service_center"],
+    "irrelevant_erds": ["rental_mobil", "gym", "laboratorium_klinik"]
+  },
+  {
+    "query_id": 32,
+    "query": "pelanggan layanan stylist appointment produk salon barbershop",
+    "description": "Query tentang salon",
+    "relevant_erds": ["salon"],
+    "irrelevant_erds": ["gym", "laundry", "hotel"]
+  },
+  {
+    "query_id": 33,
+    "query": "pegawai departemen proyek tugas kantor",
+    "description": "Query tentang kantor",
+    "relevant_erds": ["kantor"],
+    "irrelevant_erds": ["pabrik", "perpajakan", "kelurahan"]
+  },
+  {
+    "query_id": 34,
+    "query": "mahasiswa nim jurusan krs dosen mata kuliah kampus",
+    "description": "Query spesifik universitas dengan detail",
+    "relevant_erds": ["universitas"],
+    "irrelevant_erds": ["sekolah", "kursus_online", "perpustakaan"]
+  },
+  {
+    "query_id": 35,
+    "query": "pasien rawat inap dokter spesialis kamar rumah sakit",
+    "description": "Query spesifik rumah sakit",
+    "relevant_erds": ["rumah_sakit"],
+    "irrelevant_erds": ["poliklinik", "hotel", "kos_kosan"]
+  },
+  {
+    "query_id": 36,
+    "query": "transaksi pembayaran online keranjang belanja produk",
+    "description": "Query e-commerce dengan pembayaran",
+    "relevant_erds": ["e_commerce"],
+    "irrelevant_erds": ["supermarket", "bank", "toko_bangunan"]
+  },
+  {
+    "query_id": 37,
+    "query": "pemesanan kamar hotel check in check out tamu",
+    "description": "Query hotel dengan reservasi",
+    "relevant_erds": ["hotel"],
+    "irrelevant_erds": ["kos_kosan", "real_estate", "rental_mobil"]
+  },
+  {
+    "query_id": 38,
+    "query": "penerbangan tiket pesawat boarding pass maskapai",
+    "description": "Query bandara dengan penerbangan",
+    "relevant_erds": ["bandara"],
+    "irrelevant_erds": ["rental_mobil", "hotel", "ekspedisi"]
+  },
+  {
+    "query_id": 39,
+    "query": "rekening tabungan deposito bunga nasabah perbankan",
+    "description": "Query bank dengan produk perbankan",
+    "relevant_erds": ["bank"],
+    "irrelevant_erds": ["koperasi", "asuransi", "real_estate"]
+  },
+  {
+    "query_id": 40,
+    "query": "siswa nis guru wali kelas nilai ujian sekolah",
+    "description": "Query sekolah dengan detail siswa",
+    "relevant_erds": ["sekolah"],
+    "irrelevant_erds": ["universitas", "taman_kanak_kanak", "bimbingan_belajar"]
+  },
+  {
+    "query_id": 41,
+    "query": "obat resep dokter stok harga apotek farmasi",
+    "description": "Query apotek dengan detail obat",
+    "relevant_erds": ["apotek"],
+    "irrelevant_erds": ["rumah_sakit", "supermarket", "toko_bangunan"]
+  },
+  {
+    "query_id": 42,
+    "query": "tes darah urine laboratorium hasil pemeriksaan",
+    "description": "Query laboratorium dengan jenis tes",
+    "relevant_erds": ["laboratorium_klinik"],
+    "irrelevant_erds": ["rumah_sakit", "apotek", "poliklinik"]
+  },
+  {
+    "query_id": 43,
+    "query": "barang stok kasir struk pembayaran minimarket",
+    "description": "Query supermarket dengan transaksi",
+    "relevant_erds": ["supermarket"],
+    "irrelevant_erds": ["e_commerce", "apotek", "toko_bangunan"]
+  },
+  {
+    "query_id": 44,
+    "query": "menu makanan pesanan meja waiters dapur restoran",
+    "description": "Query restoran dengan detail operasional",
+    "relevant_erds": ["restoran"],
+    "irrelevant_erds": ["hotel", "supermarket", "laundry"]
+  },
+  {
+    "query_id": 45,
+    "query": "mobil sewa rental harian mingguan sopir",
+    "description": "Query rental mobil dengan detail sewa",
+    "relevant_erds": ["rental_mobil"],
+    "irrelevant_erds": ["bandara", "ekspedisi", "service_center"]
+  },
+  {
+    "query_id": 46,
+    "query": "paket resi pengiriman alamat kurir tracking ekspedisi",
+    "description": "Query ekspedisi dengan tracking",
+    "relevant_erds": ["ekspedisi"],
+    "irrelevant_erds": ["kantor", "bandara", "e_commerce"]
+  },
+  {
+    "query_id": 47,
+    "query": "anggota simpanan wajib sukarela pinjaman lunak koperasi",
+    "description": "Query koperasi dengan jenis simpanan",
+    "relevant_erds": ["koperasi"],
+    "irrelevant_erds": ["bank", "asuransi", "perpajakan"]
+  },
+  {
+    "query_id": 48,
+    "query": "polis asuransi jiwa kesehatan premi bulanan klaim",
+    "description": "Query asuransi dengan jenis polis",
+    "relevant_erds": ["asuransi"],
+    "irrelevant_erds": ["bank", "rumah_sakit", "koperasi"]
+  },
+  {
+    "query_id": 49,
+    "query": "pajak spt tahunan npwp wajib pajak pelaporan",
+    "description": "Query perpajakan dengan SPT",
+    "relevant_erds": ["perpajakan"],
+    "irrelevant_erds": ["bank", "kantor", "kelurahan"]
+  },
+  {
+    "query_id": 50,
+    "query": "ktp kk nik penduduk rt rw surat keterangan",
+    "description": "Query kelurahan dengan administrasi",
+    "relevant_erds": ["kelurahan"],
+    "irrelevant_erds": ["perpajakan", "kantor", "perpustakaan"]
+  }
+]

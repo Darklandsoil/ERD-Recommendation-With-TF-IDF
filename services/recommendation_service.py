@@ -2,7 +2,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import numpy as np
 from models.database import db
-from utils.text_processing import remove_stopwords, get_stop_words
+from utils.text_processing import remove_stopwords, get_stop_words, advanced_normalize_text
 from config import Config
 
 class ERDRecommendationService:
@@ -21,22 +21,31 @@ class ERDRecommendationService:
         self.load_and_process_erds()
     
     def create_erd_document(self, erd):
-        """Create text document from ERD data for TF-IDF"""
+        """
+        Create text document from ERD data for TF-IDF with advanced normalization
+        Applies: CamelCase splitting, special char removal, whitespace normalization, 
+                 lowercase conversion, and Indonesian stemming
+        """
         doc_parts = []
         
-        # Add ERD name
-        doc_parts.append(erd['name'].replace('_', ' '))
+        # Add ERD name (normalized with advanced processing)
+        doc_parts.append(advanced_normalize_text(erd['name']))
         
-        # Add entity names and attributes
+        # Add entity names and attributes (normalized with advanced processing)
         for entity in erd['entities']:
-            doc_parts.append(entity['name'])
-            doc_parts.extend(entity['attributes'])
+            doc_parts.append(advanced_normalize_text(entity['name']))
+            # Normalize all attributes with advanced processing
+            normalized_attrs = [advanced_normalize_text(attr) for attr in entity['attributes']]
+            doc_parts.extend(normalized_attrs)
         
-        # Add relationship information
+        # Add relationship information (normalized with advanced processing)
         for rel in erd['relationships']:
-            doc_parts.append(f"{rel['entity1']} {rel['entity2']} {rel['type']}")
+            entity1 = advanced_normalize_text(rel['entity1'])
+            entity2 = advanced_normalize_text(rel['entity2'])
+            rel_type = advanced_normalize_text(rel['type'])
+            doc_parts.append(f"{entity1} {entity2} {rel_type}")
         
-        return ' '.join(doc_parts).lower()
+        return ' '.join(doc_parts)
     
     def load_and_process_erds(self):
         """Load ERD data from database and process for TF-IDF"""
@@ -67,8 +76,11 @@ class ERDRecommendationService:
         if not self.erd_documents or self.tfidf_matrix is None:
             return []
         
-        # Preprocess query
-        processed_query = remove_stopwords(query.lower())
+        # Advanced normalize and preprocess query
+        # Applies: CamelCase splitting, special char removal, whitespace normalization,
+        #          lowercase conversion, Indonesian stemming, and stopwords removal
+        normalized_query = advanced_normalize_text(query)
+        processed_query = remove_stopwords(normalized_query)
         
         # Transform query using same TF-IDF vectorizer
         query_vector = self.tfidf_vectorizer.transform([processed_query])

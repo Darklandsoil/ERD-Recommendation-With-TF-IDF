@@ -1,7 +1,8 @@
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from models.database import db
 from models.user_model import UserModel
+from datetime import timedelta
 
 class AuthController:
     """Authentication controller"""
@@ -87,9 +88,13 @@ class AuthController:
                 }
             )
             
+            expires_delta = current_app.config.get('JWT_ACCESS_TOKEN_EXPIRES', timedelta(days=1))
+            expires_in = int(expires_delta.total_seconds())  # Dalam detik
+            
             return jsonify({
                 "message": "Login berhasil",
                 "access_token": access_token,
+                "expires_in": expires_in,
                 "user": {
                     "user_id": user.user_id,
                     "fullname": user.fullname,

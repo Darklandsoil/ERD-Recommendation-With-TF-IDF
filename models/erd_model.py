@@ -51,6 +51,14 @@ class ERDModel:
                 return False, "Format relasi tidak valid"
             if rel['entity1'] not in entity_names or rel['entity2'] not in entity_names:
                 return False, "Relasi mengacu pada entitas yang tidak ada"
+            
+            # Validate relationship attributes (only for many-to-many)
+            if 'attributes' in rel:
+                if not isinstance(rel['attributes'], list):
+                    return False, "Atribut relasi harus berupa list"
+                # Only many-to-many relationships should have attributes
+                if rel['type'] != 'many-to-many' and len(rel['attributes']) > 0:
+                    return False, "Hanya relasi many-to-many yang dapat memiliki atribut"
         
         return True, "Valid"
     
@@ -85,5 +93,8 @@ class ERDModel:
         # Add relationship information
         for rel in self.relationships:
             doc_parts.append(f"{rel['entity1']} {rel['entity2']} {rel['type']} {rel['layout']}")
+            # Add relationship attributes (for many-to-many)
+            if 'attributes' in rel and rel['attributes']:
+                doc_parts.extend(rel['attributes'])
         
         return ' '.join(doc_parts).lower()
