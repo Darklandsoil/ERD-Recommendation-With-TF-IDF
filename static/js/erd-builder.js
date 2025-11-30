@@ -671,7 +671,19 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
     // ========================================
     let radiusMultiplier = 1.0; // Default: no reduction
     
-    if (numRelations >= 3 && numAttrs >= 5) {
+    if (numRelations >= 4 && numAttrs >= 10) {
+        // 🆕 KONDISI SUPER PADAT: 4+ relasi dengan 10+ atribut
+        // Situasi SANGAT EKSTREM: perlu reduction maksimal
+        clearance = Math.max(16, clearance * 0.55); // Clearance sangat kecil
+        radiusMultiplier = 0.75; // Reduction sangat agresif
+        console.log(`🔴🔴 Super high-density case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${numRelations} relations, ${numAttrs} attrs`);
+    } else if (numRelations >= 4 && numAttrs > 7) {
+        // 🆕 KONDISI KHUSUS: 4+ relasi dengan 8-9 atribut (kasus Penduduk)
+        // Situasi sangat padat: banyak relasi memblock area + banyak atribut
+        clearance = Math.max(18, clearance * 0.6); // Clearance lebih kecil
+        radiusMultiplier = 0.80; // Reduction agresif untuk mencegah spread
+        console.log(`🔴 High-density case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${numRelations} relations, ${numAttrs} attrs`);
+    } else if (numRelations >= 3 && numAttrs >= 5) {
         // 3+ relasi dan 5+ atribut
         if (isVerticalDominant && isMixedOrientation) {
             // 🆕 MIXED ORIENTATION: Vertical dominant + ada horizontal
@@ -737,9 +749,15 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
         const angle = ((relDir.angle % 360) + 360) % 360;
         const absAngle = Math.abs(relDir.angle);
         
-        // 🆕 CLEARANCE BERBEDA untuk horizontal di mixed-orientation atau 1 relasi banyak atribut
+        // 🆕 CLEARANCE BERBEDA untuk berbagai kondisi padat
         let effectiveClearance = clearance;
-        if ((isMixedOrientation && numAttrs >= 5) || (numRelations == 1 && numAttrs >= 6)) {
+        
+        // 🆕 Kondisi khusus untuk 4+ relasi dengan 7+ atribut (high-density)
+        if (numRelations >= 4 && numAttrs >= 7) {
+            // Semua relasi mendapat clearance yang sama (tidak ada extra)
+            // Karena sudah padat, kita ingin distribusi merata
+            effectiveClearance = clearance;
+        } else if ((isMixedOrientation && numAttrs >= 5) || (numRelations == 1 && numAttrs >= 6)) {
             // Jika relasi horizontal, berikan clearance lebih besar
             const isHorizontal = (absAngle <= 30) || (absAngle >= 150 && absAngle <= 210) || (absAngle >= 330);
             if (isHorizontal) {
@@ -802,7 +820,13 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
         // ========================================
         let radiusVariance;
         // 🆕 Perbaikan variance untuk berbagai kasus
-        if ((numRelations == 2 && numAttrs == 6 && isMixedOrientation) || 
+        if (numRelations >= 4 && numAttrs >= 10) {
+            // 🆕 Variance MINIMAL untuk 4+ relasi dengan 10+ atribut (super high-density)
+            radiusVariance = (i % 2) * 0.03; // Sangat-sangat kecil: 0, 0.03, 0, 0.03
+        } else if (numRelations >= 4 && numAttrs >= 7) {
+            // 🆕 Variance sangat kecil untuk 4+ relasi dengan 7-9 atribut (high-density)
+            radiusVariance = (i % 2) * 0.05; // Sangat kecil: 0, 0.05, 0, 0.05
+        } else if ((numRelations == 2 && numAttrs == 6 && isMixedOrientation) || 
             (numRelations == 1 && numAttrs >= 6)) {
             // Variance lebih kecil dan konsisten untuk 6+ atribut
             radiusVariance = (i % 2) * 0.08; // Alternating: 0, 0.08, 0, 0.08, 0, 0.08
