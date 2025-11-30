@@ -629,38 +629,129 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
     const relDirections = getRelationshipDirections(entityName, positions);
     
     const numEntities = entities.length;
-
-    const numRelations = relDirections.length; // ← TAMBAHAN: hitung jumlah relasi
+    const numRelations = relDirections.length;
     
     let baseRadius, clearance;
     if (numEntities >= 15) {
-        baseRadius = 2.0;
+        baseRadius = 1.8; // 🆕 Kurangi dari 2.0 → 1.8
         clearance = 40;
     } else if (numEntities >= 4) {
-        baseRadius = 1.5;
+        baseRadius = 1.3; // 🆕 Kurangi dari 1.5 → 1.3 (lebih kompak)
         clearance = 35;
     } else {
-        baseRadius = 1.5;
+        baseRadius = 1.3; // 🆕 Kurangi dari 1.5 → 1.3
         clearance = 30;
     }
     
-     // ========================================
+    // ========================================
+    // ✨ DETEKSI ORIENTASI RELASI
+    // ========================================
+    let verticalRelations = 0;
+    let horizontalRelations = 0;
+    const horizontalAngles = []; // Simpan angle relasi horizontal untuk clearance khusus
+    
+    relDirections.forEach(relDir => {
+        const angle = Math.abs(relDir.angle);
+        // Vertikal: 60-120 atau 240-300 derajat
+        if ((angle >= 60 && angle <= 120) || (angle >= 240 && angle <= 300)) {
+            verticalRelations++;
+        } 
+        // Horizontal: 0-30, 150-210, atau 330-360 derajat
+        else if ((angle <= 30) || (angle >= 150 && angle <= 210) || (angle >= 330)) {
+            horizontalRelations++;
+            horizontalAngles.push(relDir.angle);
+        }
+    });
+    
+    const isVerticalDominant = verticalRelations > horizontalRelations;
+    const isMixedOrientation = verticalRelations > 0 && horizontalRelations > 0; // Ada kedua orientasi
+    
+    // ========================================
     // ✨ ADAPTIVE CLEARANCE + RADIUS REDUCTION
     // ========================================
     let radiusMultiplier = 1.0; // Default: no reduction
     
-    if (numRelations >= 2 && numAttrs >= 5) {
-        // Entitas dengan 2+ relasi dan 5+ atribut
-        clearance = Math.max(20, clearance * 0.6);
-        console.log(`🎯 Light case for ${entityName}: clearance=${clearance}°, ${numRelations} relations, ${numAttrs} attrs`);
+    if (numRelations >= 3 && numAttrs >= 5) {
+        // 3+ relasi dan 5+ atribut
+        if (isVerticalDominant && isMixedOrientation) {
+            // 🆕 MIXED ORIENTATION: Vertical dominant + ada horizontal
+            // Kondisi khusus untuk kasus seperti Produksi (2V + 1H, 5 atribut)
+            clearance = Math.max(22, clearance * 0.7); // Clearance lebih besar
+            radiusMultiplier = 0.85; // Radius reduction lebih moderat
+            console.log(`🟣 Mixed-orientation case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${verticalRelations}V ${horizontalRelations}H, ${numAttrs} attrs`);
+        } else if (isVerticalDominant) {
+            // Pure vertical dominant: kurangi radius, perkecil clearance
+            clearance = Math.max(15, clearance * 0.5);
+            radiusMultiplier = 0.75; // Kurangi radius 25%
+            console.log(`🔵 Vertical-dominant case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${verticalRelations}V ${horizontalRelations}H, ${numAttrs} attrs`);
+        } else {
+            // Relasi horizontal dominan: clearance normal
+            clearance = Math.max(20, clearance * 0.65);
+            radiusMultiplier = 0.90;
+            console.log(`🟢 Horizontal-dominant case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${verticalRelations}V ${horizontalRelations}H, ${numAttrs} attrs`);
+        }
+    } else if (numRelations == 2 && numAttrs >= 5) {
+        // 🆕 Kondisi khusus untuk 2 relasi (bukan >= 2)
+        if (isMixedOrientation) {
+            // Mixed orientation (1V + 1H) - kasus Pegawai
+            if (numAttrs == 6) {
+                // 🆕 KASUS KHUSUS 6 ATRIBUT: Problem dengan distribusi genap
+                clearance = Math.max(25, clearance * 0.75); // Clearance lebih besar
+                radiusMultiplier = 0.88; // Radius sedikit dikurangi
+                console.log(`🟠 Special 6-attr case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${verticalRelations}V ${horizontalRelations}H`);
+            } else {
+                // 5, 7+ atribut: Normal handling
+                clearance = Math.max(22, clearance * 0.7);
+                radiusMultiplier = 0.92;
+                console.log(`🟡 Mixed 2-relation case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${verticalRelations}V ${horizontalRelations}H, ${numAttrs} attrs`);
+            }
+        } else if (isVerticalDominant) {
+            clearance = Math.max(18, clearance * 0.55);
+            radiusMultiplier = 0.85;
+        } else {
+            clearance = Math.max(20, clearance * 0.6);
+            radiusMultiplier = 0.95;
+        }
+        console.log(`🟡 2-relation case for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${verticalRelations}V ${horizontalRelations}H`);
+    } else if (numRelations == 1 && numAttrs >= 5) {
+        // 🆕 Kondisi khusus untuk 1 relasi dengan 5+ atribut (kasus Obat)
+        // Agar konsisten dengan Rekam_Medis yang punya 2 relasi
+        clearance = Math.max(25, clearance * 0.75);
+        radiusMultiplier = 0.88; // Sama dengan kondisi 2 relasi, 6 atribut, mixed
+        console.log(`🔵 1-relation with 5+ attrs for ${entityName}: clearance=${clearance}°, radius×${radiusMultiplier}, ${numRelations} relation, ${numAttrs} attrs`);
+    } else if (numAttrs >= 2 && numAttrs <= 4) {
+        // 🆕 Kondisi untuk entitas dengan 2-4 atribut (entitas kecil)
+        // Cegah radius terlalu besar yang menyebabkan zoom out
+        radiusMultiplier = 0.90; // Reduction moderat
+        console.log(`🟤 Small entity for ${entityName}: radius×${radiusMultiplier}, ${numRelations} relations, ${numAttrs} attrs`);
+    } else if (numAttrs >= 1) {
+        // 🆕 DEFAULT: Semua entitas dengan 1+ atribut mendapat reduction
+        // Cegah ada entitas yang menggunakan radiusMultiplier = 1.0 (full)
+        radiusMultiplier = 0.92; // Default reduction ringan
+        console.log(`⚪ Default case for ${entityName}: radius×${radiusMultiplier}, ${numRelations} relations, ${numAttrs} attrs`);
     }
     // ========================================
     
     const blockedRanges = [];
     relDirections.forEach(relDir => {
         const angle = ((relDir.angle % 360) + 360) % 360;
-        const startBlock = ((angle - clearance) % 360 + 360) % 360;
-        const endBlock = ((angle + clearance) % 360 + 360) % 360;
+        const absAngle = Math.abs(relDir.angle);
+        
+        // 🆕 CLEARANCE BERBEDA untuk horizontal di mixed-orientation atau 1 relasi banyak atribut
+        let effectiveClearance = clearance;
+        if ((isMixedOrientation && numAttrs >= 5) || (numRelations == 1 && numAttrs >= 6)) {
+            // Jika relasi horizontal, berikan clearance lebih besar
+            const isHorizontal = (absAngle <= 30) || (absAngle >= 150 && absAngle <= 210) || (absAngle >= 330);
+            if (isHorizontal) {
+                // 🆕 Extra clearance untuk 6+ atribut
+                const multiplier = ((numRelations == 2 && numAttrs == 6) || (numRelations == 1 && numAttrs >= 6)) ? 1.8 : 1.5;
+                effectiveClearance = clearance * multiplier;
+                console.log(`  ↔️ Horizontal relation at ${angle}° gets extra clearance: ${effectiveClearance}° (${multiplier}x)`);
+            }
+        }
+        
+        const startBlock = ((angle - effectiveClearance) % 360 + 360) % 360;
+        const endBlock = ((angle + effectiveClearance) % 360 + 360) % 360;
         blockedRanges.push({ start: startBlock, end: endBlock });
     });
     
@@ -709,8 +800,20 @@ function distributeAttributes(entityName, entityPos, attrs, positions) {
         // ========================================
         // ✨ ADAPTIVE RADIUS dengan multiplier
         // ========================================
-        const radiusVariance = (i % 3) * 0.15 * radiusMultiplier;
-        const radius = baseRadius * (1.0 + radiusVariance);
+        let radiusVariance;
+        // 🆕 Perbaikan variance untuk berbagai kasus
+        if ((numRelations == 2 && numAttrs == 6 && isMixedOrientation) || 
+            (numRelations == 1 && numAttrs >= 6)) {
+            // Variance lebih kecil dan konsisten untuk 6+ atribut
+            radiusVariance = (i % 2) * 0.08; // Alternating: 0, 0.08, 0, 0.08, 0, 0.08
+        } else if (numAttrs >= 2 && numAttrs <= 4) {
+            // 🆕 Variance kecil untuk entitas dengan 2-4 atribut (cegah zoom out)
+            radiusVariance = (i % 2) * 0.06; // Lebih kecil lagi: 0, 0.06, 0, 0.06
+        } else {
+            // 🆕 Default variance pattern - dikurangi dari 0.15 → 0.10
+            radiusVariance = (i % 3) * 0.10; // 0, 0.10, 0.20 (lebih kompak dari sebelumnya)
+        }
+        const radius = baseRadius * radiusMultiplier * (1.0 + radiusVariance);
         // ========================================
         
         const attrX = entityPos.x + radius * Math.cos(angleRad);
